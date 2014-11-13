@@ -1,8 +1,8 @@
         .text
 LC0:
         .ascii "%d  Alex est con\12\0"
-.globl _main
-_main:
+.globl main
+main:
         pushl   %ebp
         movl    %esp, %ebp
 		
@@ -11,9 +11,9 @@ _main:
 loope:
         pushl   %ecx        #parametres pour printf
         pushl   $LC0
-        call    _printf
+        call    printf
 
-        popl    %eax        #on vire la valeur retournee   
+        addl    $4, %esp    #on vire la valeur retournee   
         popl    %ecx        #on recupère notre compteur
 
         addl    $1, %ecx
@@ -22,7 +22,7 @@ loope:
         
         movl    %ecx, %eax
         subl    $10, %eax
-		jnz loope           #on s arrete de compter lorsque notre compteur - 10 == 0
+	jnz loope           #on s'arrete de compter lorsque notre compteur - 10 == 0
 		
         leave
         ret
