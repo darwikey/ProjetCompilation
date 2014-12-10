@@ -2,12 +2,12 @@
 int main() {
 
 	float a[1000];
-	float b[1000];
+	float s = 0;
 	int i;
 	
-	#pragma omp simd
+	#pragma omp simd reduction(+: s)
 	for (i=0; i < 1000; i++) {
-		a[i] = b[i] + 5.0;
+		s = s + a[i];
 	}
 
     return 0;

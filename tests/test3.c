@@ -1,3 +1,4 @@
+float sqrt(float);
 
 int main() {
 
@@ -7,7 +8,7 @@ int main() {
 	
 	#pragma omp simd
 	for (i=0; i < 1000; i++) {
-		a[i] = b[i] + 5.0;
+		a[i] = sqrtf(b[i]) + 5.0;
 	}
 
     return 0;
