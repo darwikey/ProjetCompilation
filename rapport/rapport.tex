@@ -1,0 +1,61 @@
+\documentclass[a4paper,8pt,french,fleqn]{report}
+%Packages:
+
+%Langages:
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%Mise en page
+\usepackage[top=2cm, right=2cm, bottom=2cm, left=2cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{enumerate}
+\usepackage{color}
+
+%Titre et auteurs
+\title{\textbf{Compilation}\\\textit{Rapport $1^{ere}$ Phase}}
+
+\author{PHILIPPI Alexande \& MAUPEU Xavier \& FIOT Arthur \& DEVOIR Loïc}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Equipe}
+
+L'équipe sera constitué de MAUPEU Xavier, FIOT Arthur, DEVOIR Loïc et PHILIPPI Alexandre. Tous les quatre font parties du groupe 4 de travaux dirigés, avec comme encadrant Mr. SERGENT Marc.
+
+\section*{Sujet}
+
+L'extension implémentée sera la ``Boucle for vectorielle'' via les deux pragmas : ``\#pragma omp simd'' et ``\#pragma omp simd reduction(+: id)''.
+
+\section*{Tests}
+
+Dix tests ont été implémentés au total, dont trois tests contenant des erreurs. Cette liste de tests n'est en aucun cas figé et de nouveau tests seront surement ajouté par la suite.
+
+\subsection*{Tests sans erreurs}
+
+Les trois premiers tests réalisent des calculs plus ou moins compliqués sur des ``Boucle for vectorielle'' en utilisant l'addition, la soustraction, le produit, la division et la fonction racine carrée. \\
+
+Le test quatre consiste en l'imbrication de deux boucles ``for'', la deuxième étant vectorielle. \\
+
+Le cinquième test revient sur les opérations de base au sein d'un boucle vectorielle. \\
+
+Le sixième test utilise une variable scalaire. \\
+
+Le septième test mélange les opérations mathématiques de base avec une variable scalaire et avec les tableaux. \\
+
+\subsection*{Tests avec erreurs}
+
+Le premier test vérifie que le compilateur détecte bien la présence d'une opération autre qu'une assignation au sein d'une ``boucle for vectorielle.'' \\
+
+Dans le second test, le compilateur doit remarquer la présence d'une opération permise avec l'accés à la cellule $i + 1$ du tableau b. \\
+
+Finalement le dernier test vérifie que l'itérateur ne puisse pas être choisi comme variable scalaire.
+
+\end{document}
