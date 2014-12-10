@@ -3,7 +3,7 @@ int main() {
 
 	int a[1000];
 	
-	if (1)
+	for (int i = 0; i < 10; i++)
 	{
 		int b[1000];
 		int c[1000];
@@ -13,7 +13,7 @@ int main() {
 		for (i = 0; i < 1000; i++) {
 			a[i] = b[i] + 5.0;
 			c[i] = (a[i] + b[i] + c[i]) / 3;
-		}	
+		}
 	}
 	
     return 0;
