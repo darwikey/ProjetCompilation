@@ -1,20 +1,19 @@
-
 int main() {
 
-	int a[1000];
+  int a[1000];
 	
-	for (int i = 0; i < 10; i++)
-	{
-		int b[1000];
-		int c[1000];
-		int i;
+  for (int i = 0; i < 10; i++)
+    {
+      int b[1000];
+      int c[1000];
+      int i;
 		
-		#pragma omp simd
-		for (i = 0; i < 1000; i++) {
-			a[i] = b[i] + 5.0;
-			c[i] = (a[i] + b[i] + c[i]) / 3;
-		}
-	}
+#pragma omp simd
+      for (j = 0; j < 1000; j++) {
+	a[j] = b[j] + 5.0;
+	c[j] = (a[j] + b[j] + c[j]) / 3;
+      }
+    }
 	
-    return 0;
+  return 0;
 }
