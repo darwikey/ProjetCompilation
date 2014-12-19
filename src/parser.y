@@ -1,6 +1,7 @@
 %{
   #include <stdio.h>
-  
+  #include <string>
+  #include <iostream>
   extern int yylineno;
 
   extern "C"{
@@ -9,9 +10,10 @@
     int yyerror (char*);
   }
 
-  /*enum declarator_type{
-    INT, FLOAT, FUNCTION
-    };*/
+
+  typedef enum{
+    TYPE_INT, TYPE_FLOAT, TYPE_FUNCTION
+  }declarator_type;
 %}
 
 %token <str> IDENTIFIER 
@@ -21,22 +23,22 @@
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR
 %union {
-  char *str;
+  std::string *str;
   int int_num;
   float float_num;
-  //enum declarator_type type;
+  //decl_type;
 }
 %start program
 %%
 
 primary_expression
-: IDENTIFIER   {printf("id : %s\n", $1);}
+: IDENTIFIER   {std::cout << "id : " << *$1 << std::endl;}
 | ICONSTANT   {printf("int const : %d\n", $1);}
 | FCONSTANT   {printf("float const : %f\n", $1);}
 | '(' expression ')'
 | IDENTIFIER '(' ')'  {printf("appelle fonction\n");}
 | IDENTIFIER '(' argument_expression_list ')'   {printf("appelle fonction parametre\n");}
-| IDENTIFIER INC_OP {printf("increment %s\n", $1);}
+| IDENTIFIER INC_OP {std::cout << "increment " << *$1 << std::endl;}
 | IDENTIFIER DEC_OP
 | IDENTIFIER '[' expression ']'
 ;
