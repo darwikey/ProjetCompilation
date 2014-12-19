@@ -8,6 +8,7 @@ L[a-zA-Z_]
 void count();
 int comment ();
 int check_type ();
+#define YYSTYPE
 %}
 
 %option yylineno
@@ -25,8 +26,8 @@ int check_type ();
 
 {L}({L}|{D})*	{ count(); yylval.str=strdup(yytext); return(IDENTIFIER); }
 
-{D}+    	{ count(); yylval.str=strdup(yytext); return(ICONSTANT); }
-{D}+"."{D}*     { count(); yylval.str=strdup(yytext); return(FCONSTANT);}
+{D}+    	{ count(); yylval.int_num = atoi(yytext); return(ICONSTANT); }
+{D}+"."{D}*     { count(); yylval.float_num = atof(yytext); return(FCONSTANT);}
 "++"		{ count(); return(INC_OP); }
 "--"		{ count(); return(DEC_OP); }
 "<="		{ count(); return(LE_OP); }
