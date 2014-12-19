@@ -1,2 +1,2 @@
-typedef enum{SCALAR_T, ARRAY_T, FUNCTION_T}
+enum{VOID_T, INT_T, FLOAT_T, ARRAY_T, FUNCTION_T};
 

@@ -2,7 +2,8 @@
   #include <stdio.h>
   #include <string>
   #include <iostream>
-  extern int yylineno;
+  #include "parser.h"
+
 
   extern "C"{
     int yyparse();
@@ -10,35 +11,34 @@
     int yyerror (char*);
   }
 
+  using namespace std;
 
-  typedef enum{
-    TYPE_INT, TYPE_FLOAT, TYPE_FUNCTION
-  }declarator_type;
 %}
-
 %token <str> IDENTIFIER 
 %token <int_num> ICONSTANT
 %token <float_num> FCONSTANT
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR
+%type <type> type_name declarator declarator_list
+
 %union {
-  std::string *str;
+  std::string* str;
   int int_num;
   float float_num;
-  //decl_type;
+  int type;
 }
 %start program
 %%
 
 primary_expression
-: IDENTIFIER   {std::cout << "id : " << *$1 << std::endl;}
-| ICONSTANT   {printf("int const : %d\n", $1);}
-| FCONSTANT   {printf("float const : %f\n", $1);}
+: IDENTIFIER   //{cout << "id : " << *$1 << endl;}
+| ICONSTANT   {cout << "int const : " << $1 << endl;}
+| FCONSTANT   {cout << "float const : " << $1 << endl;}
 | '(' expression ')'
-| IDENTIFIER '(' ')'  {printf("appelle fonction\n");}
-| IDENTIFIER '(' argument_expression_list ')'   {printf("appelle fonction parametre\n");}
-| IDENTIFIER INC_OP {std::cout << "increment " << *$1 << std::endl;}
+| IDENTIFIER '(' ')'  {cout << "appelle fonction" << endl;}
+| IDENTIFIER '(' argument_expression_list ')'   {cout << "appelle fonction parametre" << endl;}
+| IDENTIFIER INC_OP {cout << "increment " << *$1 << endl;}
 | IDENTIFIER DEC_OP
 | IDENTIFIER '[' expression ']'
 ;
@@ -82,22 +82,22 @@ expression
 ;
 
 declaration
-: type_name declarator_list ';'
+: type_name declarator_list ';' {cout << "new var :\n \ttype : "<< $1 << endl;}
 ;
 
 declarator_list
-: declarator
-| declarator_list ',' declarator 
+: declarator 
+| declarator_list ',' declarator
 ;
 
 type_name
-: VOID 
-| INT  
-| FLOAT
+: VOID {$$ = VOID_T;}
+| INT  {$$ = INT_T;}
+| FLOAT {$$ = FLOAT_T;}
 ;
 
 declarator
-: IDENTIFIER  
+: IDENTIFIER
 | '*' IDENTIFIER 
 | IDENTIFIER '[' ICONSTANT ']'
 | declarator '(' parameter_list ')'
