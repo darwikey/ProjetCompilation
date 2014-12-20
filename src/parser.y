@@ -1,29 +1,42 @@
 %{
-    #include <stdio.h>
-    extern int yylineno;
-    int yylex ();
-    int yyerror ();
+  #include <stdio.h>
+  
+  extern int yylineno;
 
+  extern "C"{
+    int yyparse();
+    int yylex ();
+    int yyerror (char*);
+  }
+
+  /*enum declarator_type{
+    INT, FLOAT, FUNCTION
+    };*/
 %}
 
-%token <str> IDENTIFIER ICONSTANT FCONSTANT
+%token <str> IDENTIFIER 
+%token <int_num> ICONSTANT
+%token <float_num> FCONSTANT
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR
 %union {
   char *str;
+  int int_num;
+  float float_num;
+  //enum declarator_type type;
 }
 %start program
 %%
 
 primary_expression
-: IDENTIFIER
-| ICONSTANT
-| FCONSTANT
+: IDENTIFIER   {printf("id : %s\n", $1);}
+| ICONSTANT   {printf("int const : %d\n", $1);}
+| FCONSTANT   {printf("float const : %f\n", $1);}
 | '(' expression ')'
-| IDENTIFIER '(' ')'
-| IDENTIFIER '(' argument_expression_list ')'
-| IDENTIFIER INC_OP
+| IDENTIFIER '(' ')'  {printf("appelle fonction\n");}
+| IDENTIFIER '(' argument_expression_list ')'   {printf("appelle fonction parametre\n");}
+| IDENTIFIER INC_OP {printf("increment %s\n", $1);}
 | IDENTIFIER DEC_OP
 | IDENTIFIER '[' expression ']'
 ;
@@ -72,7 +85,7 @@ declaration
 
 declarator_list
 : declarator
-| declarator_list ',' declarator
+| declarator_list ',' declarator 
 ;
 
 type_name
@@ -83,10 +96,10 @@ type_name
 
 declarator
 : IDENTIFIER  
-| '*' IDENTIFIER
+| '*' IDENTIFIER 
 | IDENTIFIER '[' ICONSTANT ']'
 | declarator '(' parameter_list ')'
-| declarator '(' ')'
+| declarator '(' ')' 
 ;
 
 parameter_list
@@ -167,12 +180,13 @@ extern FILE *yyin;
 
 char *file_name = NULL;
 
-int yyerror (char *s) {
+extern "C"{
+  int yyerror (char *s) {
     fflush (stdout);
     fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
     return 0;
+  }
 }
-
 
 int main (int argc, char *argv[]) {
     FILE *input = NULL;

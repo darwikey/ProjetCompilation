@@ -1,20 +1,24 @@
 LEX=lex
-YACC=yacc
+YACC=bison
 CFLAGS=-Wall
 CC=gcc
+CCP=g++
 
 all: parser
 
-parser:parser.c scanner.c
-	$(CC) $(CFLAGS) -o $@ $^
+parser:parser.cpp scanner.o
+	$(CCP) $(CFLAGS) -o $@ $^
 
-parser.c:parser.y
+parser.cpp:parser.y
 	$(YACC) -o $@ --defines=parser.tab.h $^
 
-%.c:%.l
+scanner.o:scanner.c
+	$(CC) $(CFLAGS) -c $^ -o $@
+
+scanner.c:scanner.l
 	$(LEX) -o $@ $^
 tests:
-	for i in `ls ../tests/*.c`; do echo $$i; ./parser $$i; done
+	for i in `ls tests/*.c`; do echo $$i; ./parser $$i; done
 
 clean:
-	rm -f parser.c parser.tab.h parser.tab.c scanner.c
+	rm -f parser.cpp parser.tab.h parser.tab.c scanner.c *.o
