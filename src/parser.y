@@ -99,7 +99,7 @@ declaration
 ;
 
 declarator_list
-  : declarator {$$ = new vector<Declarator*>(0); $$->push_back($1);} 
+  : declarator {$$ = new vector<Declarator*>(); $$->push_back($1);} 
   | declarator_list ',' declarator {$$->push_back($3);}
 ;
 
@@ -121,16 +121,15 @@ declarator
 | declarator '(' ')' {$$ = $1; $$->is_function = true;}
 ;
 
+// liste de parametre pour un prototype de function
 parameter_list
 : parameter_declaration {$$ = new vector<Declarator*>(); $$->push_back($1);}
 | parameter_list ',' parameter_declaration {$$->push_back($3);}
 ;
 
+// parametre pour un prototype de function
 parameter_declaration
-: type_name declarator {
-  for (Declarator* it: *$2){
-    it->type = $1;
-  }}
+: type_name declarator {$$ = $2; $$->type = $1;}
 ;
 
 statement

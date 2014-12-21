@@ -14,8 +14,9 @@ enum class Declarator_structure{
 };
 
 struct Declarator{  
+
   Declarator(std::string fName, Declarator_structure fStructure) : name(fName), 
-structure(fStructure){
+  structure(fStructure){
 }
 
   std::string name;
