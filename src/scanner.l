@@ -6,6 +6,7 @@ L[a-zA-Z_]
 #include <string>
 #include <vector>
 #include "Declarator.hpp"
+#include "Function.hpp"
 #include "parser.tab.h"
 
 extern "C"{

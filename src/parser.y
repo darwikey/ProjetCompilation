@@ -5,7 +5,7 @@
   #include <iostream>
   #include "parser.h"
   #include "Declarator.hpp"
-
+  #include "Function.hpp"
 
   extern "C"{
     int yyparse();
@@ -24,6 +24,7 @@
 %token IF ELSE WHILE RETURN FOR
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
+%type <function> function_definition
 %type <declarator_list> declarator_list parameter_list
 
 
@@ -33,6 +34,7 @@
   float float_num;
   Declarator_type type;
   Declarator* declarator;
+  Function* function;
   std::vector<Declarator*>* declarator_list;
 }
 %start program
@@ -179,13 +181,17 @@ program
 | program external_declaration
 ;
 
+// implementation des fonctions
 external_declaration
 : function_definition
 | declaration
 ;
 
 function_definition
-: type_name declarator compound_statement
+: type_name declarator compound_statement {
+  $2->type = $1;
+  $$ = new Function($2);
+  cout << *$$ << endl;}
 ;
 
 %%

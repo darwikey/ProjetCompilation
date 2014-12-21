@@ -1,3 +1,5 @@
+.PHONY: all parser tests clean
+
 LEX=lex
 YACC=bison
 CFLAGS=-Wall -Wno-write-strings -std=c++11
