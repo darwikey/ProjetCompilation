@@ -4,6 +4,8 @@ L[a-zA-Z_]
 %{
 #include <stdio.h>
 #include <string>
+#include <vector>
+#include "Declarator.hpp"
 #include "parser.tab.h"
 
 extern "C"{
