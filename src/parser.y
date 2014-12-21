@@ -90,11 +90,9 @@ expression
 
 declaration
 : type_name declarator_list ';' {
-  cout << "new var :\n \t type : "<< (int)$1 <<endl;
   for (Declarator* it: *$2){
     it->type = $1;
-    cout << "\t name : " << it->name << endl;
-    cout << "\t structure : " << (int)it->structure << endl;
+    cout << "new declarator : " << *it << endl;
   }}
 ;
 

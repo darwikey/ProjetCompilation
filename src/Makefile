@@ -1,6 +1,6 @@
 LEX=lex
 YACC=bison
-CFLAGS=-Wall -std=c++11
+CFLAGS=-Wall -Wno-write-strings -std=c++11
 CCP=g++
 
 all: parser
