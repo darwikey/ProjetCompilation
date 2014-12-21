@@ -6,6 +6,8 @@
   #include "parser.h"
   #include "Declarator.hpp"
   #include "Function.hpp"
+  #include "Block.hpp"
+
 
   extern "C"{
     int yyparse();
@@ -14,6 +16,10 @@
   }
 
   using namespace std;
+
+  //**** variables globales ****
+  // un bloc contient toute les variables
+  vector<Block> block (1);
 
 %}
 %token <str> IDENTIFIER 
@@ -25,7 +31,7 @@
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
 %type <function> function_definition
-%type <declarator_list> declarator_list parameter_list
+%type <declarator_list> declarator_list parameter_list declaration
 
 
 %union {
@@ -92,6 +98,7 @@ expression
 
 declaration
 : type_name declarator_list ';' {
+  $$ = $2;
   for (Declarator* it: *$2){
     it->type = $1;
     cout << "new declarator : " << *it << endl;
@@ -184,14 +191,15 @@ program
 // implementation des fonctions
 external_declaration
 : function_definition
-| declaration
+| declaration {}
 ;
 
 function_definition
 : type_name declarator compound_statement {
   $2->type = $1;
   $$ = new Function($2);
-  cout << *$$ << endl;}
+  cout << *$$ << endl;
+}
 ;
 
 %%
