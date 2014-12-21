@@ -3,12 +3,21 @@ L[a-zA-Z_]
 
 %{
 #include <stdio.h>
-#include <string.h>
+#include <string>
+#include <vector>
+#include "Declarator.hpp"
 #include "parser.tab.h"
+
+extern "C"{
+int yylex(void);
+}
+
+#define YYSTYPE
+
+
 void count();
 int comment ();
 int check_type ();
-#define YYSTYPE
 %}
 
 %option yylineno
@@ -24,7 +33,7 @@ int check_type ();
 "while"		{ count(); return(WHILE); }
 "for"		{ count(); return(FOR); }
 
-{L}({L}|{D})*	{ count(); yylval.str=strdup(yytext); return(IDENTIFIER); }
+{L}({L}|{D})*	{ count(); yylval.str=new std::string(yytext); return(IDENTIFIER); }
 
 {D}+    	{ count(); yylval.int_num = atoi(yytext); return(ICONSTANT); }
 {D}+"."{D}*     { count(); yylval.float_num = atof(yytext); return(FCONSTANT);}
@@ -64,8 +73,8 @@ int comment() {
 	char c, c1;
 
 loop:
-	while ((c = input()) != '*' && c != 0);
-	if ((c1 = input()) != '/' && c != 0) {
+	while ((c = yyinput()) != '*' && c != 0);
+	if ((c1 = yyinput()) != '/' && c != 0) {
 		unput(c1);
 		goto loop;
 	}
