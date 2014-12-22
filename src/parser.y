@@ -222,7 +222,7 @@ external_declaration
 function_definition
 : type_name declarator compound_statement {
   $2->type = $1;
-  $$ = new Function($2);
+  $$ = new Function($2, $3);
   cout << *$$ << endl;
 }
 ;
