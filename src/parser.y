@@ -41,6 +41,10 @@
 %type <declarator_list> declarator_list parameter_list declaration declaration_list
 %type <block> compound_statement
 %type <statement> statement statement_list
+%type <expression> expression_statement expression
+%type <selection> selection_statement
+%type <iteration> iteration_statement
+%type <jump> jump_statement
 
 %union {
   std::string* str;
@@ -52,6 +56,10 @@
   std::vector<Declarator*>* declarator_list;
   Block* block;
   Statement* statement;
+  Expression* expression;
+  Selection* selection;
+  Iteration* iteration;
+  Jump* jump;
 }
 
 %start program
@@ -151,11 +159,11 @@ parameter_declaration
 ;
 
 statement
-: compound_statement {}
-| expression_statement 
-| selection_statement
-| iteration_statement
-| jump_statement
+: compound_statement {$$ = $1;}
+| expression_statement {$$ = $1;}  
+| selection_statement {$$ = $1;}
+| iteration_statement {$$ = $1;}
+| jump_statement {$$ = $1;}
 ;
 
 compound_statement
@@ -181,8 +189,8 @@ statement_list
 ;
 
 expression_statement
-: ';'
-| expression ';'
+: ';' {$$ = new Expression();}
+| expression ';' {$$ = $1;}
 ;
 
 selection_statement
@@ -222,6 +230,7 @@ function_definition
 %%
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
 
 extern char yytext[];
 extern int column;
@@ -250,6 +259,17 @@ int main (int argc, char *argv[]) {
       
       try{
 	yyparse();
+
+	ofstream output ("out.s", ios::out | ios::trunc);
+	if (output){
+	  output << main_block.get_code();
+
+	  output.close();
+	}
+	else{
+	  cerr << "unable to open output file" << endl;
+	  return 1;
+	}
       }
       catch(const exception& e){
 	cerr << "error : " << e.what() << endl;
