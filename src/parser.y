@@ -12,8 +12,7 @@
   #include "Selection.hpp"
   #include "Iteration.hpp"
   #include "Jump.hpp"
-  #include "Block.hpp"
-
+  #include "Main_block.hpp"
 
   extern "C"{
     int yyparse();
@@ -25,7 +24,7 @@
 
   //**** variables globales ****
   // un bloc contient toute les variables
-  Block main_block;
+  Main_block main_block;
 
 %}
 %token <str> IDENTIFIER 

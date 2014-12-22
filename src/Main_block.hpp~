@@ -9,9 +9,7 @@
 
 
 struct Declarator;
-
-/* block de declaration et d'instruction
-   un nouveau block est creer dans chaque {...}*/
+struct Function;
 
 class Block : public Statement{  
 public:
@@ -22,10 +20,12 @@ public:
 
 
   void add_declaration(std::vector<Declarator*> fList);
+  void add_function(Function* fFunction);
 
 
-protected:
+private:
   std::map<std::string, Declarator*> variables;
+  std::map<std::string, Function*> functions;
 };
 
 
