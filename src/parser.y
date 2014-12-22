@@ -3,6 +3,7 @@
   #include <string>
   #include <vector>
   #include <iostream>
+  #include <stdexcept>
   #include "parser.h"
   #include "Declarator.hpp"
   #include "Function.hpp"
@@ -31,7 +32,7 @@
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
 %type <function> function_definition
-%type <declarator_list> declarator_list parameter_list declaration
+%type <declarator_list> declarator_list parameter_list declaration declaration_list
 
 
 %union {
@@ -150,12 +151,15 @@ statement
 compound_statement
 : '{' '}'
 | '{' statement_list '}'
-| '{' declaration_list statement_list '}'
+| '{' declaration_list statement_list '}' {cout << "block " << block.size() << endl;}
 ;
 
 declaration_list
-: declaration
-| declaration_list declaration
+: declaration {$$ = $1;}
+| declaration_list declaration {
+  $$ = $1;
+  $$->insert($$->end(), $2->begin(), $2->end()); // fusionne les deux listes
+ }
 ;
 
 statement_list
@@ -190,8 +194,8 @@ program
 
 // implementation des fonctions
 external_declaration
-: function_definition
-| declaration {}
+: function_definition {block.resize(2); block[1] = Block();}
+| declaration {block[0].add_declaration(*$1);}
 ;
 
 function_definition
@@ -211,34 +215,43 @@ extern int column;
 extern int yylineno;
 extern FILE *yyin;
 
-char *file_name = NULL;
+string file_name;
 
 extern "C"{
   int yyerror (char *s) {
     fflush (stdout);
-    cerr << file_name << ": " << yylineno << ":" << ": " << s;
+    cerr << file_name << ":l" << yylineno << ": " << s << endl;
     return 0;
   }
 }
 
+
 int main (int argc, char *argv[]) {
-    FILE *input = NULL;
-    if (argc==2) {
-	input = fopen (argv[1], "r");
-	file_name = strdup (argv[1]);
-	if (input) {
-	    yyin = input;
-	    yyparse();
-	}
-	else {
-	  cerr << argv[0] << ": Could not open " << argv[1] << endl;
-	  return 1;
-	}
-	free(file_name);
+  FILE *input = NULL;
+  if (argc==2) {
+    input = fopen (argv[1], "r");
+    file_name = argv[1];
+
+    if (input) {
+      yyin = input;
+      
+      try{
+	yyparse();
+      }
+      catch(const exception& e){
+	cerr << "error : " << e.what() << endl;
+	return 1;
+      }
     }
     else {
-	cerr << "error: no input file" << endl;
-	return 1;
+      cerr << argv[0] << ": Could not open " << argv[1] << endl;
+      return 1;
     }
+    
+  }
+  else {
+    cerr << "error: no input file" << endl;
+    return 1;
+  }
     return 0;
 }
