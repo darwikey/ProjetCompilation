@@ -7,6 +7,7 @@
   #include "parser.h"
   #include "Declarator.hpp"
   #include "Function.hpp"
+  #include "Statement.hpp"
   #include "Block.hpp"
 
 
@@ -20,7 +21,7 @@
 
   //**** variables globales ****
   // un bloc contient toute les variables
-  vector<Block> block (1);
+  Block main_block;
 
 %}
 %token <str> IDENTIFIER 
@@ -29,11 +30,13 @@
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR
+
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
 %type <function> function_definition
 %type <declarator_list> declarator_list parameter_list declaration declaration_list
-
+%type <block> compound_statement
+%type <statement> statement
 
 %union {
   std::string* str;
@@ -43,7 +46,10 @@
   Declarator* declarator;
   Function* function;
   std::vector<Declarator*>* declarator_list;
+  Block* block;
+  Statement* statement;
 }
+
 %start program
 %%
 
@@ -141,7 +147,7 @@ parameter_declaration
 ;
 
 statement
-: compound_statement
+: compound_statement {}
 | expression_statement 
 | selection_statement
 | iteration_statement
@@ -149,9 +155,12 @@ statement
 ;
 
 compound_statement
-: '{' '}'
-| '{' statement_list '}'
-| '{' declaration_list statement_list '}' {cout << "block " << block.size() << endl;}
+: '{' '}' {$$ = new Block();}
+| '{' statement_list '}' {$$ = new Block();}
+| '{' declaration_list statement_list '}' {
+  $$ = new Block();
+  $$->add_declaration(*$2);
+}
 ;
 
 declaration_list
@@ -194,8 +203,8 @@ program
 
 // implementation des fonctions
 external_declaration
-: function_definition {block.resize(2); block[1] = Block();}
-| declaration {block[0].add_declaration(*$1);}
+: function_definition {main_block.add_function($1);}
+| declaration {main_block.add_declaration(*$1);}
 ;
 
 function_definition

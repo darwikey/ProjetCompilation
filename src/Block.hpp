@@ -9,6 +9,7 @@
 
 
 struct Declarator;
+struct Function;
 
 struct Block{  
 
@@ -26,7 +27,18 @@ struct Block{
     }
   }
 
+
+  void add_function(Function* fFunction){
+    if (functions.find(fFunction->declarator->name) == functions.end()){
+      functions.insert(std::pair<std::string, Function*>(fFunction->declarator->name, fFunction));
+    }
+    else{
+      throw std::logic_error("function " + fFunction->declarator->name + " already exist");
+    } 
+  }
+
   std::map<std::string, Declarator*> variables;
+  std::map<std::string, Function*> functions;
 };
 
 
