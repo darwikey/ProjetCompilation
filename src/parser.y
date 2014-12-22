@@ -8,6 +8,10 @@
   #include "Declarator.hpp"
   #include "Function.hpp"
   #include "Statement.hpp"
+  #include "Expression.hpp"
+  #include "Selection.hpp"
+  #include "Iteration.hpp"
+  #include "Jump.hpp"
   #include "Block.hpp"
 
 
@@ -36,7 +40,7 @@
 %type <function> function_definition
 %type <declarator_list> declarator_list parameter_list declaration declaration_list
 %type <block> compound_statement
-%type <statement> statement
+%type <statement> statement statement_list
 
 %union {
   std::string* str;
@@ -172,8 +176,8 @@ declaration_list
 ;
 
 statement_list
-: statement
-| statement_list statement
+: statement {$$ = $1;}
+| statement_list statement {$$ = $1; $$->add_statement($2);}
 ;
 
 expression_statement

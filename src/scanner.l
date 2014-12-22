@@ -9,6 +9,10 @@ L[a-zA-Z_]
 #include "Function.hpp"
 #include "Block.hpp"
 #include "Statement.hpp"
+#include "Expression.hpp"
+#include "Selection.hpp"
+#include "Iteration.hpp"
+#include "Jump.hpp"
 #include "parser.tab.h"
 
 extern "C"{
