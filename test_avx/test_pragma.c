@@ -6,7 +6,7 @@ int main(void) {
 
 	int a[N], b[N];
 
-	#pragma omp simd
+#pragma omp simd
 	for(int i=0; i<N; i++) {
 		
 		a[i] = i;

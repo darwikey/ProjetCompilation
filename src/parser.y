@@ -39,8 +39,9 @@
 %type <function> function_definition
 %type <declarator_list> declarator_list parameter_list declaration declaration_list
 %type <block> compound_statement
-%type <statement> statement statement_list
-%type <expression> expression_statement expression
+%type <statement> statement
+%type <statement_list> statement_list
+%type <expression> expression_statement expression comparison_expression additive_expression multiplicative_expression  
 %type <selection> selection_statement
 %type <iteration> iteration_statement
 %type <jump> jump_statement
@@ -55,6 +56,7 @@
   std::vector<Declarator*>* declarator_list;
   Block* block;
   Statement* statement;
+  std::vector<Statement*>* statement_list;
   Expression* expression;
   Selection* selection;
   Iteration* iteration;
@@ -69,9 +71,9 @@ primary_expression
 | ICONSTANT   //{cout << "int const : " << $1 << endl;}
 | FCONSTANT   //{cout << "float const : " << $1 << endl;}
 | '(' expression ')'
-| IDENTIFIER '(' ')'  {cout << "appelle fonction" << endl;}
-| IDENTIFIER '(' argument_expression_list ')'   {cout << "appelle fonction parametre" << endl;}
-| IDENTIFIER INC_OP {cout << "increment " << *$1 << endl;}
+| IDENTIFIER '(' ')' 
+| IDENTIFIER '(' argument_expression_list ')'
+| IDENTIFIER INC_OP
 | IDENTIFIER DEC_OP
 | IDENTIFIER '[' expression ']'
 ;
@@ -109,9 +111,9 @@ comparison_expression
 ;
 
 expression
-: IDENTIFIER '=' comparison_expression
-| IDENTIFIER '[' expression ']' '=' comparison_expression
-| comparison_expression
+: IDENTIFIER '=' comparison_expression {$$ = new Assignment(*$1, $3);}
+| IDENTIFIER '[' expression ']' '=' comparison_expression {$$ = new Assignment(*$1, $3, $6);}
+| comparison_expression {$$ = $1;}
 ;
 
 declaration
@@ -167,11 +169,15 @@ statement
 
 compound_statement
 : '{' '}' {$$ = new Block();}
-| '{' statement_list '}' {$$ = new Block();}
+| '{' statement_list '}' {
+  $$ = new Block();
+  $$->add_statement($2);
+}
 | '{' declaration_list statement_list '}' {
   $$ = new Block();
   $$->add_declaration(*$2);
   $$->add_statement($3);
+  cout<<"new block";
 }
 ;
 
@@ -184,8 +190,8 @@ declaration_list
 ;
 
 statement_list
-: statement {$$ = $1;}
-| statement_list statement {$$ = $1; $$->add_statement($2);}
+: statement {$$ = new vector<Statement*>(); $$->push_back($1);}
+| statement_list statement {$$ = $1; $$->push_back($2);}
 ;
 
 expression_statement

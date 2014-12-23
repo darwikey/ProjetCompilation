@@ -7,7 +7,7 @@
 #include <stdexcept>
 
 class Block;
-class Function;
+struct Function;
 
 class Statement{
 public:

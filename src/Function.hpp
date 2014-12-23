@@ -35,7 +35,7 @@ struct Function{
     code += block->get_code(fParent_blocks, this);
       
     // fin de la fonction
-    code += "leave\n";
+    code += "\nleave\n";
     code += "ret\n\n";
 
     return code;
