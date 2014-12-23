@@ -23,7 +23,7 @@
   using namespace std;
 
   //**** variables globales ****
-  // un bloc contient toute les variables
+  // bloc principale contenant tous les autres blocs
   Main_block main_block;
 
 %}
@@ -171,6 +171,7 @@ compound_statement
 | '{' declaration_list statement_list '}' {
   $$ = new Block();
   $$->add_declaration(*$2);
+  $$->add_statement($3);
 }
 ;
 
@@ -261,7 +262,7 @@ int main (int argc, char *argv[]) {
 
 	ofstream output ("out.s", ios::out | ios::trunc);
 	if (output){
-	  output << main_block.get_code();
+	  output << main_block.get_code(vector<Block*>(), nullptr);
 
 	  output.close();
 	}
