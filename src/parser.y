@@ -3,9 +3,16 @@
   #include <string>
   #include <vector>
   #include <iostream>
+  #include <stdexcept>
   #include "parser.h"
   #include "Declarator.hpp"
-
+  #include "Function.hpp"
+  #include "Statement.hpp"
+  #include "Expression.hpp"
+  #include "Selection.hpp"
+  #include "Iteration.hpp"
+  #include "Jump.hpp"
+  #include "Main_block.hpp"
 
   extern "C"{
     int yyparse();
@@ -15,6 +22,10 @@
 
   using namespace std;
 
+  //**** variables globales ****
+  // un bloc contient toute les variables
+  Main_block main_block;
+
 %}
 %token <str> IDENTIFIER 
 %token <int_num> ICONSTANT
@@ -22,10 +33,17 @@
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
 %token IF ELSE WHILE RETURN FOR
+
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
-%type <declarator_list> declarator_list parameter_list
-
+%type <function> function_definition
+%type <declarator_list> declarator_list parameter_list declaration declaration_list
+%type <block> compound_statement
+%type <statement> statement statement_list
+%type <expression> expression_statement expression
+%type <selection> selection_statement
+%type <iteration> iteration_statement
+%type <jump> jump_statement
 
 %union {
   std::string* str;
@@ -33,8 +51,16 @@
   float float_num;
   Declarator_type type;
   Declarator* declarator;
+  Function* function;
   std::vector<Declarator*>* declarator_list;
+  Block* block;
+  Statement* statement;
+  Expression* expression;
+  Selection* selection;
+  Iteration* iteration;
+  Jump* jump;
 }
+
 %start program
 %%
 
@@ -90,11 +116,10 @@ expression
 
 declaration
 : type_name declarator_list ';' {
-  cout << "new var :\n \t type : "<< (int)$1 <<endl;
+  $$ = $2;
   for (Declarator* it: *$2){
     it->type = $1;
-    cout << "\t name : " << it->name << endl;
-    cout << "\t structure : " << (int)it->structure << endl;
+    cout << "new declarator : " << *it << endl;
   }}
 ;
 
@@ -133,32 +158,38 @@ parameter_declaration
 ;
 
 statement
-: compound_statement
-| expression_statement 
-| selection_statement
-| iteration_statement
-| jump_statement
+: compound_statement {$$ = $1;}
+| expression_statement {$$ = $1;}  
+| selection_statement {$$ = $1;}
+| iteration_statement {$$ = $1;}
+| jump_statement {$$ = $1;}
 ;
 
 compound_statement
-: '{' '}'
-| '{' statement_list '}'
-| '{' declaration_list statement_list '}'
+: '{' '}' {$$ = new Block();}
+| '{' statement_list '}' {$$ = new Block();}
+| '{' declaration_list statement_list '}' {
+  $$ = new Block();
+  $$->add_declaration(*$2);
+}
 ;
 
 declaration_list
-: declaration
-| declaration_list declaration
+: declaration {$$ = $1;}
+| declaration_list declaration {
+  $$ = $1;
+  $$->insert($$->end(), $2->begin(), $2->end()); // fusionne les deux listes
+ }
 ;
 
 statement_list
-: statement
-| statement_list statement
+: statement {$$ = $1;}
+| statement_list statement {$$ = $1; $$->add_statement($2);}
 ;
 
 expression_statement
-: ';'
-| expression ';'
+: ';' {$$ = new Expression();}
+| expression ';' {$$ = $1;}
 ;
 
 selection_statement
@@ -181,52 +212,78 @@ program
 | program external_declaration
 ;
 
+// implementation des fonctions
 external_declaration
-: function_definition
-| declaration
+: function_definition {main_block.add_function($1);}
+| declaration {main_block.add_declaration(*$1);}
 ;
 
 function_definition
-: type_name declarator compound_statement
+: type_name declarator compound_statement {
+  $2->type = $1;
+  $$ = new Function($2, $3);
+  cout << *$$ << endl;
+}
 ;
 
 %%
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
 
 extern char yytext[];
 extern int column;
 extern int yylineno;
 extern FILE *yyin;
 
-char *file_name = NULL;
+string file_name;
 
 extern "C"{
   int yyerror (char *s) {
     fflush (stdout);
-    cerr << file_name << ": " << yylineno << ":" << ": " << s;
+    cerr << file_name << ":l" << yylineno << ": " << s << endl;
     return 0;
   }
 }
 
+
 int main (int argc, char *argv[]) {
-    FILE *input = NULL;
-    if (argc==2) {
-	input = fopen (argv[1], "r");
-	file_name = strdup (argv[1]);
-	if (input) {
-	    yyin = input;
-	    yyparse();
+  FILE *input = NULL;
+  if (argc==2) {
+    input = fopen (argv[1], "r");
+    file_name = argv[1];
+
+    if (input) {
+      yyin = input;
+      
+      try{
+	yyparse();
+
+	ofstream output ("out.s", ios::out | ios::trunc);
+	if (output){
+	  output << main_block.get_code();
+
+	  output.close();
 	}
-	else {
-	  cerr << argv[0] << ": Could not open " << argv[1] << endl;
+	else{
+	  cerr << "unable to open output file" << endl;
 	  return 1;
 	}
-	free(file_name);
+      }
+      catch(const exception& e){
+	cerr << "error : " << e.what() << endl;
+	return 1;
+      }
     }
     else {
-	cerr << "error: no input file" << endl;
-	return 1;
+      cerr << argv[0] << ": Could not open " << argv[1] << endl;
+      return 1;
     }
+    
+  }
+  else {
+    cerr << "error: no input file" << endl;
+    return 1;
+  }
     return 0;
 }

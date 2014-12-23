@@ -1,11 +1,13 @@
+.PHONY: all parser tests clean
+
 LEX=lex
 YACC=bison
-CFLAGS=-Wall -std=c++11
+CFLAGS=-Wall -Wno-write-strings -std=c++11
 CCP=g++
 
 all: parser
 
-parser:parser.cpp scanner.cpp
+parser:parser.cpp scanner.cpp Block.cpp Main_block.cpp
 	$(CCP) $(CFLAGS) -o $@ $^
 
 parser.cpp:parser.y
