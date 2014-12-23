@@ -4,14 +4,16 @@
 #include "Declarator.hpp"
 
 
-std::string Main_block::get_code(){
+std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
   std::string code;
+  fParent_blocks.push_back(static_cast<Block*>(this));
   
   // TODO variables globales
   
+  // code pour toutes les fonctions
   for (auto f : functions){
-
-    code += f.second->get_code();
+    
+    code += f.second->get_code(fParent_blocks);
   }
 
 

@@ -18,7 +18,7 @@ public:
   Block() {
   }
 
-  virtual std::string get_code() override;
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
 
 
   void add_declaration(std::vector<Declarator*> fList);
@@ -26,6 +26,8 @@ public:
 
 protected:
   std::map<std::string, Declarator*> variables;
+  
+
 };
 
 
