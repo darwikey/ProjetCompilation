@@ -25,6 +25,12 @@ public:
     }
   }
 
+  void add_statement(std::vector<Statement*> fStatement){
+    for (Statement* it : fStatement){
+      statements.push_back(it);
+    }
+  }
+
 
 protected:
   std::vector<Statement*> statements;

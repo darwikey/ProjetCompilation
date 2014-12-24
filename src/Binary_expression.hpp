@@ -9,7 +9,7 @@
 
 
 enum class Binary_type{
-  MULTIPLICATIVE, ADDITIVE, COMPARISON
+  MULTIPLICATION, ADDITION, SUBTRACTION, LOWER, GREATER, LOWER_EQUAL, GREATER_EQUAL, EQUAL, NOT_EQUAL
 };
 
 class Binary_expression : public Expression{
@@ -27,8 +27,13 @@ public:
 
 
 private:
-  Binary_type type;
+  bool is_comparison(Binary_type fType){
+    return fType >= Binary_type::LOWER;
+  }
 
+  Binary_type type;
+  Expression* expression1;
+  Expression* expression2;
 };
 
 

@@ -3,6 +3,7 @@
 #include "Function.hpp"
 #include "Declarator.hpp"
 #include "Statement.hpp"
+#include <sstream>
 
 
 std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
@@ -28,11 +29,45 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
   }
 
   for (Statement* s : statements){
-    code += s->get_code(fParent_blocks, fFunction) + "\n";
+    code += s->get_code(fParent_blocks, fFunction);
   }
 
   return code;
 }
+
+
+bool Block::is_variable(std::string fIdentifier){
+  auto it = variables.find(fIdentifier);
+
+  return it != variables.end();
+}
+
+
+std::string Block::get_code_load_variable(std::string fIdentifier, std::string fRegister){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    std::ostringstream str;
+    str << "movl " << it->second->stack_position << "(%ebp), %" << fRegister << "\n";
+    return str.str();
+  }
+
+  return "";
+}
+
+
+std::string Block::get_code_store_variable(std::string fIdentifier, std::string fRegister){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    std::ostringstream str;
+    str << "movl %" << fRegister << ", " << it->second->stack_position << "(%ebp)\n";
+    return str.str();
+  }
+
+  return "";
+}
+
 
 void Block::add_declaration(std::vector<Declarator*> fList){
   for (Declarator* it : fList){ 

@@ -16,6 +16,21 @@ public:
     return "";
   }
 
+  // retourne le bloc contenant une variable s'appelant fIdentifier
+  // jete une exception si elle n'existe pas
+  static Block* get_block(std::vector<Block*> fParent_blocks, std::string fIdentifier){
+    Block* declaration_block = nullptr;
+    for (Block* block : fParent_blocks){
+      if (block->is_variable(fIdentifier)){
+	declaration_block = block;
+      }
+    }
+    
+    if (declaration_block == nullptr){
+      throw std::logic_error(fIdentifier + " not declared");
+    }
+    return declaration_block;
+  }
 
 private:
 

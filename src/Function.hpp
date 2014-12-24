@@ -17,12 +17,12 @@ struct Function{
   std::string get_code(std::vector<Block*> fParent_blocks) {
     std::string code;
     // entête de la fonction
-    code += ".glob " + declarator->name + "\n";
+    code += ".globl " + declarator->name + "\n";
     code += declarator->name + ":\n";
     
     // adresse de retour
     code += "pushl %ebp\n";
-    code += "movl %esp %ebp\n\n";
+    code += "movl %esp, %ebp\n\n";
 
     // recherche des emplacements des arguments sur la pile
     int position = 8;

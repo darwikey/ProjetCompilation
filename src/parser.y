@@ -9,6 +9,10 @@
   #include "Function.hpp"
   #include "Statement.hpp"
   #include "Expression.hpp"
+  #include "Assignment.hpp"
+  #include "Binary_expression.hpp"
+  #include "Unary_expression.hpp"
+  #include "Primary_expression.hpp"
   #include "Selection.hpp"
   #include "Iteration.hpp"
   #include "Jump.hpp"
@@ -41,10 +45,11 @@
 %type <block> compound_statement
 %type <statement> statement
 %type <statement_list> statement_list
-%type <expression> expression_statement expression comparison_expression additive_expression multiplicative_expression  
+%type <expression> expression_statement expression comparison_expression additive_expression multiplicative_expression unary_expression primary_expression
 %type <selection> selection_statement
 %type <iteration> iteration_statement
 %type <jump> jump_statement
+%type <function_parameter> argument_expression_list
 
 %union {
   std::string* str;
@@ -61,53 +66,78 @@
   Selection* selection;
   Iteration* iteration;
   Jump* jump;
+  std::vector<Expression*>* function_parameter;
 }
 
 %start program
 %%
 
 primary_expression
-: IDENTIFIER   //{cout << "id : " << *$1 << endl;}
-| ICONSTANT   //{cout << "int const : " << $1 << endl;}
-| FCONSTANT   //{cout << "float const : " << $1 << endl;}
-| '(' expression ')'
-| IDENTIFIER '(' ')' 
-| IDENTIFIER '(' argument_expression_list ')'
-| IDENTIFIER INC_OP
-| IDENTIFIER DEC_OP
-| IDENTIFIER '[' expression ']'
+: IDENTIFIER {
+  $$ = new Primary_expression(Primary_type::VARIABLE, *$1);
+}
+| ICONSTANT {
+  $$ = new Primary_expression((int)$1);
+}
+| FCONSTANT {
+  $$ = new Primary_expression((float)$1);
+} 
+| '(' expression ')' {
+  $$ = new Primary_expression(Primary_type::EXPRESSION, "", $2);
+}
+| IDENTIFIER '(' ')' {
+  $$ = new Primary_expression(Primary_type::FUNCTION, vector<Expression*>());
+}
+| IDENTIFIER '(' argument_expression_list ')' {
+  $$ = new Primary_expression(Primary_type::FUNCTION, *$3);
+}
+| IDENTIFIER INC_OP {
+  $$ = new Primary_expression(Primary_type::INCREMENTED_VARIABLE, *$1);
+}
+| IDENTIFIER DEC_OP {
+  $$ = new Primary_expression(Primary_type::DECREMENTED_VARIABLE, *$1);
+}
+| IDENTIFIER '[' expression ']' {
+  $$ = new Primary_expression(Primary_type::ARRAY, *$1, $3);
+}
 ;
 
 argument_expression_list
-: expression
-| argument_expression_list ',' expression
+: expression {
+  $$ = new vector<Expression*>(); 
+  $$->push_back($1);
+}
+| argument_expression_list ',' expression {
+  $$ = $1;
+  $$->push_back($3);
+}
 ;
 
 unary_expression
-: primary_expression
-| '-' unary_expression
-| '!' unary_expression
+: primary_expression {$$ = $1;}
+| '-' unary_expression {$$ = new Unary_expression(Unary_type::NEGATIVE, $2);}
+| '!' unary_expression {$$ = new Unary_expression(Unary_type::NOT, $2);}
 ;
 
 multiplicative_expression
-: unary_expression
-| multiplicative_expression '*' unary_expression
+: unary_expression {$$ = $1;}
+| multiplicative_expression '*' unary_expression {$$ = new Binary_expression(Binary_type::MULTIPLICATION, $1, $3);}
 ;
 
 additive_expression
-: multiplicative_expression
-| additive_expression '+' multiplicative_expression
-| additive_expression '-' multiplicative_expression
+: multiplicative_expression {$$ = $1;}
+| additive_expression '+' multiplicative_expression {$$ = new Binary_expression(Binary_type::ADDITION, $1, $3);}
+| additive_expression '-' multiplicative_expression {$$ = new Binary_expression(Binary_type::SUBTRACTION, $1, $3);}
 ;
 
 comparison_expression
-: additive_expression
-| additive_expression '<' additive_expression
-| additive_expression '>' additive_expression
-| additive_expression LE_OP additive_expression
-| additive_expression GE_OP additive_expression
-| additive_expression EQ_OP additive_expression
-| additive_expression NE_OP additive_expression
+: additive_expression {$$ = $1;}
+| additive_expression '<' additive_expression {$$ = new Binary_expression(Binary_type::LOWER, $1, $3);}
+| additive_expression '>' additive_expression {$$ = new Binary_expression(Binary_type::GREATER, $1, $3);}
+| additive_expression LE_OP additive_expression {$$ = new Binary_expression(Binary_type::LOWER_EQUAL, $1, $3);}
+| additive_expression GE_OP additive_expression {$$ = new Binary_expression(Binary_type::GREATER_EQUAL, $1, $3);}
+| additive_expression EQ_OP additive_expression {$$ = new Binary_expression(Binary_type::EQUAL, $1, $3);}
+| additive_expression NE_OP additive_expression {$$ = new Binary_expression(Binary_type::NOT_EQUAL, $1, $3);}
 ;
 
 expression
@@ -126,8 +156,8 @@ declaration
 ;
 
 declarator_list
-  : declarator {$$ = new vector<Declarator*>(); $$->push_back($1);} 
-  | declarator_list ',' declarator {$$->push_back($3);}
+: declarator {$$ = new vector<Declarator*>(); $$->push_back($1);} 
+| declarator_list ',' declarator {$$ = $1; $$->push_back($3);}
 ;
 
 type_name
@@ -151,7 +181,7 @@ declarator
 // liste de parametre pour un prototype de function
 parameter_list
 : parameter_declaration {$$ = new vector<Declarator*>(); $$->push_back($1);}
-| parameter_list ',' parameter_declaration {$$->push_back($3);}
+| parameter_list ',' parameter_declaration {$$ = $1; $$->push_back($3);}
 ;
 
 // parametre pour un prototype de function
@@ -171,12 +201,12 @@ compound_statement
 : '{' '}' {$$ = new Block();}
 | '{' statement_list '}' {
   $$ = new Block();
-  $$->add_statement($2);
+  $$->add_statement(*$2);
 }
 | '{' declaration_list statement_list '}' {
   $$ = new Block();
   $$->add_declaration(*$2);
-  $$->add_statement($3);
+  $$->add_statement(*$3);
   cout<<"new block";
 }
 ;
@@ -210,8 +240,8 @@ iteration_statement
 ;
 
 jump_statement
-: RETURN ';'
-| RETURN expression ';'
+: RETURN ';' {$$ = new Jump();}
+| RETURN expression ';'{$$ = new Jump($2);}
 ;
 
 program

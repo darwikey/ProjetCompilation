@@ -15,11 +15,12 @@ struct Function;
 
 class Main_block : public Block{  
 public:
-  Main_block() {
-  }
+  Main_block();
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
 
+  // code source placé au debut du code assembleur
+  std::string get_header();
 
   void add_function(Function* fFunction);
 
