@@ -19,13 +19,16 @@ public:
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
 
+
+  void add_function(Function* fFunction);
+  
+  Declarator* get_function_declarator(std::string fIdentifier);
+  
+
+private:
   // code source placé au debut du code assembleur
   std::string get_header();
 
-  void add_function(Function* fFunction);
-
-
-private:
   std::map<std::string, Function*> functions;
 };
 

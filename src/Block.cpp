@@ -8,18 +8,25 @@
 
 std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
   std::string code;
-  fParent_blocks.push_back(this);
   
   // on ajoute les variables locales sur la pile
-  int position = -4;
+  int position = 0;
+  if (!fParent_blocks.empty()){
+    position = fParent_blocks.back()->top_stack_position;
+  }
+  
+  // on empile les blocs
+  fParent_blocks.push_back(this);
+
   for (auto it : variables){
     Declarator* var = it.second;
 
     if (! var->is_function) {
-      var->stack_position = position;
+      var->stack_position = position - 4;
       
       if (var->structure == Declarator_structure::VARIABLE && var->type == Declarator_type::INT){
 	code += "pushl $0\n";
+	position -= 4;
       }
       else {
 	throw std::logic_error("local variable (" + Declarator::get_string(var->structure) + " " + Declarator::get_string(var->type) + ") are not supported");
@@ -27,6 +34,8 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
       
     }
   }
+
+  top_stack_position = position;
 
   for (Statement* s : statements){
     code += s->get_code(fParent_blocks, fFunction);

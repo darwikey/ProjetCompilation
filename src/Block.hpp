@@ -35,6 +35,8 @@ public:
 protected:
   std::map<std::string, Declarator*> variables;
   
+  //indique le sommet de la pile
+  int top_stack_position = 0;
 
 };
 

@@ -86,10 +86,10 @@ primary_expression
   $$ = new Primary_expression(Primary_type::EXPRESSION, "", $2);
 }
 | IDENTIFIER '(' ')' {
-  $$ = new Primary_expression(Primary_type::FUNCTION, vector<Expression*>());
+  $$ = new Primary_expression(Primary_type::FUNCTION, *$1, vector<Expression*>());
 }
 | IDENTIFIER '(' argument_expression_list ')' {
-  $$ = new Primary_expression(Primary_type::FUNCTION, *$3);
+  $$ = new Primary_expression(Primary_type::FUNCTION, *$1, *$3);
 }
 | IDENTIFIER INC_OP {
   $$ = new Primary_expression(Primary_type::INCREMENTED_VARIABLE, *$1);
@@ -207,7 +207,6 @@ compound_statement
   $$ = new Block();
   $$->add_declaration(*$2);
   $$->add_statement(*$3);
-  cout<<"new block";
 }
 ;
 

@@ -83,3 +83,19 @@ void Main_block::add_function(Function* fFunction){
     throw std::logic_error("function " + fFunction->declarator->name + " already exist");
   } 
 }
+
+
+Declarator* Main_block::get_function_declarator(std::string fIdentifier){
+  auto it1 = functions.find(fIdentifier);
+  auto it2 = variables.find(fIdentifier);
+
+  if (it1 != functions.end()){
+    return it1->second->declarator;
+  }
+  else if (it2 != variables.end()){
+    return it2->second;
+  }
+  else {
+    throw std::logic_error("undeclared function : " + fIdentifier);
+  }
+}

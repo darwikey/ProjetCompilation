@@ -21,14 +21,18 @@ public:
   
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+    std::string code = expression->get_code(fParent_blocks, fFunction);
+
     if (type == Unary_type::NOT){
-      //TODO
+      code += "cmpl $0, %eax \n\
+sete %al \n\
+movzbl %al, %eax \n";
     }
     else if (type == Unary_type::NEGATIVE){
-      //TODO
+      code += "negl %eax\n";
     }
 
-    return "";
+    return code;
   }
 
 
