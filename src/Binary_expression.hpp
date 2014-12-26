@@ -22,15 +22,70 @@ public:
   
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
-    return "";
+    std::string code = expression1->get_code(fParent_blocks, fFunction);
+    // on empile le resultat
+    code += "pushl %eax\n";
+
+    code += expression2->get_code(fParent_blocks, fFunction);
+    code += "movl %eax, %ecx \n";
+    //on recupère le résultat de notre première expression
+    code += "popl %eax\n";
+    
+    switch(type){
+    case Binary_type::MULTIPLICATION:
+      code += "imul %ecx, %eax\n";
+      break;
+
+    case Binary_type::ADDITION:
+      code += "addl %ecx, %eax\n";
+      break;
+
+    case Binary_type::SUBTRACTION:
+      code += "subl %ecx, %eax\n";
+      break;
+      
+    case Binary_type::LOWER:
+      code += "cmpl %ecx, %eax \n\
+setl %al \n\
+movzbl %al, %eax \n";
+      break;
+
+    case Binary_type::GREATER:
+      code += "cmpl %ecx, %eax \n\
+setg %al \n\
+movzbl %al, %eax \n";
+      break;
+      
+    case Binary_type::LOWER_EQUAL:
+      code += "cmpl %ecx, %eax \n\
+setle %al \n\
+movzbl %al, %eax \n";
+      break;
+  
+    case Binary_type::GREATER_EQUAL:
+      code += "cmpl %ecx, %eax \n\
+setge %al \n\
+movzbl %al, %eax \n";
+      break;
+
+    case Binary_type::EQUAL:
+      code += "cmpl %ecx, %eax \n\
+sete %al \n\
+movzbl %al, %eax \n";
+      break;
+  
+    case Binary_type::NOT_EQUAL:
+      code += "cmpl %ecx, %eax \n\
+setne %al \n\
+movzbl %al, %eax \n";   
+      break;
+
+    }
+    return code;
   }
 
 
 private:
-  bool is_comparison(Binary_type fType){
-    return fType >= Binary_type::LOWER;
-  }
-
   Binary_type type;
   Expression* expression1;
   Expression* expression2;
