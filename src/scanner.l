@@ -16,6 +16,8 @@ L[a-zA-Z_]
 #include "Primary_expression.hpp"
 #include "Selection.hpp"
 #include "Iteration.hpp"
+#include "While.hpp"
+#include "For.hpp"
 #include "Jump.hpp"
 #include "parser.tab.h"
 

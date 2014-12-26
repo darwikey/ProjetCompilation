@@ -15,6 +15,8 @@
   #include "Primary_expression.hpp"
   #include "Selection.hpp"
   #include "Iteration.hpp"
+  #include "While.hpp"
+  #include "For.hpp"
   #include "Jump.hpp"
   #include "Main_block.hpp"
 
@@ -234,8 +236,8 @@ selection_statement
 ;
 
 iteration_statement
-: WHILE '(' expression ')' statement
-| FOR '(' expression_statement expression_statement expression ')' statement
+: WHILE '(' expression ')' statement {$$ = new While($3, $5);}
+| FOR '(' expression_statement expression_statement expression ')' statement {$$ = new For($3, $4, $5, $7);}
 ;
 
 jump_statement
