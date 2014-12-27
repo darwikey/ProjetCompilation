@@ -7,7 +7,7 @@ CCP=g++
 
 all: parser
 
-parser:parser.cpp scanner.cpp Block.cpp Main_block.cpp Iteration.cpp
+parser:parser.cpp scanner.cpp Block.cpp Main_block.cpp Iteration.cpp Selection.cpp
 	$(CCP) $(CFLAGS) -o $@ $^
 
 parser.cpp:parser.y

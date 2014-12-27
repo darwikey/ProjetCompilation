@@ -71,8 +71,9 @@ public:
 	Declarator* function = main->get_function_declarator(identifier);
 	int stack_size = 0;
 
-	for (Expression* expr : function_parameter){
-	  code += expr->get_code(fParent_blocks, fFunction);
+	// parcours du conteneur dans le sens inverse
+	for (auto expr = function_parameter.rbegin(); expr != function_parameter.rend(); ++expr){
+	  code += (*expr)->get_code(fParent_blocks, fFunction);
 	  //TODO verif type
 	  
 	  code += "pushl %eax\n";

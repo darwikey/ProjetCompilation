@@ -21,7 +21,8 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
   for (auto it : variables){
     Declarator* var = it.second;
 
-    if (! var->is_function) {
+    // si la variable n'a pas encore de position dans la pile, c'est une variable local et on doit reserver de l'espace dans la pile
+    if (! var->is_function && var->stack_position == 0) {
       var->stack_position = position - 4;
       
       if (var->structure == Declarator_structure::VARIABLE && var->type == Declarator_type::INT){

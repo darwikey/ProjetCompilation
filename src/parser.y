@@ -231,8 +231,8 @@ expression_statement
 ;
 
 selection_statement
-: IF '(' expression ')' statement
-| IF '(' expression ')' statement ELSE statement
+: IF '(' expression ')' statement {$$ = new Selection($3, $5, nullptr);}
+| IF '(' expression ')' statement ELSE statement {$$ = new Selection($3, $5, $7);}
 ;
 
 iteration_statement

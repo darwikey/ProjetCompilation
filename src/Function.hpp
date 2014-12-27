@@ -12,6 +12,17 @@ class Block;
 struct Function{  
 
   Function(Declarator* fDeclarator, Block* fBlock) : declarator(fDeclarator), block(fBlock) {
+    // recherche des emplacements des arguments sur la pile
+    int position = 8;
+    for (Declarator* parameter : declarator->parameter_list) {
+      parameter->stack_position = position;
+
+      position += 4; // a modif pour les float et les tableaux
+    }
+
+    // copie de la declaration dans le bloc
+    block->add_declaration(declarator->parameter_list);
+    
   }
 
   std::string get_code(std::vector<Block*> fParent_blocks) {
@@ -23,14 +34,6 @@ struct Function{
     // adresse de retour
     code += "pushl %ebp\n";
     code += "movl %esp, %ebp\n\n";
-
-    // recherche des emplacements des arguments sur la pile
-    int position = 8;
-    for (Declarator* parameter : declarator->parameter_list) {
-      parameter->stack_position = position;
-
-      position += 4; // a modif pour les float et les tableaux
-    }
     
     code += block->get_code(fParent_blocks, this);
       
