@@ -26,8 +26,14 @@ public:
   // renvoie l'instruction assembleur correspondant au chargement d'une variable dans un registre
   virtual std::string get_code_load_variable(std::string fIdentifier, std::string fRegister);
 
-// renvoie l'instruction assembleur correspondant au stockage d'un registre dans une variable
+  // renvoie l'instruction assembleur correspondant au chargement d'une case d'un tableau dans un registre
+  virtual std::string get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest);
+
+  // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une variable
   virtual std::string get_code_store_variable(std::string fIdentifier, std::string fRegister);
+
+  // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une case de tableau
+  virtual std::string get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_value);
 
   void add_declaration(std::vector<Declarator*> fList);
 

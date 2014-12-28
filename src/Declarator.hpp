@@ -27,6 +27,9 @@ struct Declarator{
   //indique la position de la variable dans la pile
   int stack_position = 0;
 
+  // dans le cas d'un tableau
+  size_t array_size = 0;
+
   // dans le cas d'un prototype de fonction
   bool is_function = false;
   std::vector<Declarator*> parameter_list;

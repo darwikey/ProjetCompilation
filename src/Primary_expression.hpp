@@ -107,6 +107,13 @@ public:
       break;
 
     case Primary_type::ARRAY:
+      {
+	code += expression->get_code(fParent_blocks, fFunction);
+
+	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
+	code += declaration_block->get_code_load_array(identifier, "eax", "eax");
+      }
+
       break;
     }
 

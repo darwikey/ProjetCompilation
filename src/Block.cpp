@@ -29,6 +29,12 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
 	code += "pushl $0\n";
 	position -= 4;
       }
+      else if (var->structure == Declarator_structure::ARRAY && var->type == Declarator_type::INT){
+	std::ostringstream str;
+	str << "subl $" << var->array_size * 4 << ", %esp\n";
+	code += str.str();
+	position -= 4 * var->array_size;
+      }
       else {
 	throw std::logic_error("local variable (" + Declarator::get_string(var->structure) + " " + Declarator::get_string(var->type) + ") are not supported");
       }
@@ -62,6 +68,23 @@ std::string Block::get_code_load_variable(std::string fIdentifier, std::string f
     return str.str();
   }
 
+  throw std::logic_error("variable " + fIdentifier + " undeclared");
+  return "";
+}
+
+std::string Block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
+      std::ostringstream str;
+      str << "negl %" << fRegister_index << "\n";
+      str << "movl " << it->second->stack_position << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      return str.str();
+    }
+  }
+
+  throw std::logic_error(fIdentifier + " undeclared or is not an array or a pointer");
   return "";
 }
 
@@ -75,6 +98,24 @@ std::string Block::get_code_store_variable(std::string fIdentifier, std::string 
     return str.str();
   }
 
+  throw std::logic_error("variable " + fIdentifier + " undeclared");
+  return "";
+}
+
+
+std::string Block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
+      std::ostringstream str;
+      str << "negl %" << fRegister_index << "\n";
+      str << "movl %" << fRegister_dest << ", " << it->second->stack_position << "(%ebp" << ", %" << fRegister_index << ", 4)\n";
+      return str.str();
+    }
+  }
+
+  throw std::logic_error(fIdentifier + " undeclared or is not an array or a pointer");
   return "";
 }
 
@@ -83,8 +124,6 @@ void Block::add_declaration(std::vector<Declarator*> fList){
   for (Declarator* it : fList){ 
     if (variables.find(it->name) == variables.end()){
       variables.insert(std::pair<std::string, Declarator*>(it->name, it));
-      
-      
 
     }
     else{

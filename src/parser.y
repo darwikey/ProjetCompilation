@@ -174,7 +174,7 @@ declarator
 //pointeur
 | '*' IDENTIFIER {$$ = new Declarator(*$2, Declarator_structure::POINTER);}
 //tableau
-| IDENTIFIER '[' ICONSTANT ']' {$$ = new Declarator(*$1, Declarator_structure::ARRAY);}
+| IDENTIFIER '[' ICONSTANT ']' {$$ = new Declarator(*$1, Declarator_structure::ARRAY); $$->array_size = $3;}
 // prototype de fonction
 | declarator '(' parameter_list ')' {$$ = $1; $$->is_function = true; $$->parameter_list = *$3;}
 | declarator '(' ')' {$$ = $1; $$->is_function = true;}
