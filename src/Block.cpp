@@ -78,8 +78,8 @@ std::string Block::get_code_load_array(std::string fIdentifier, std::string fReg
   if (it != variables.end()){
     if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
       std::ostringstream str;
-      str << "negl %" << fRegister_index << "\n";
-      str << "movl " << it->second->stack_position << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
+      str << "movl " << address << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
       return str.str();
     }
   }
@@ -109,8 +109,8 @@ std::string Block::get_code_store_array(std::string fIdentifier, std::string fRe
   if (it != variables.end()){
     if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
       std::ostringstream str;
-      str << "negl %" << fRegister_index << "\n";
-      str << "movl %" << fRegister_dest << ", " << it->second->stack_position << "(%ebp" << ", %" << fRegister_index << ", 4)\n";
+      int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
+      str << "movl %" << fRegister_dest << ", " << address << "(%ebp" << ", %" << fRegister_index << ", 4)\n";
       return str.str();
     }
   }
