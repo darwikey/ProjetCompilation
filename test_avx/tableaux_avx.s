@@ -27,9 +27,9 @@ init:
 add_vec:
 	movl     -4(%ebp), %eax
 	vmovups  -12292(%ebp, %eax, 4), %ymm0
-	vmovups  -8196(%ebp, %eax, 4), %ymm1
-	vaddps   %ymm0, %ymm1, %ymm2
-	vmovups  %ymm2, -4100(%ebp, %eax, 4)
+	#vmovups  -8196(%ebp, %eax, 4), %ymm1
+	#vaddps   %ymm0, %ymm1, %ymm2
+	#vmovups  %ymm2, -4100(%ebp, %eax, 4)
 
 	movl  -4100(%ebp, %eax, 4), %edx
   subl  $4, %esp

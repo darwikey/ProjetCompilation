@@ -23,6 +23,12 @@ public:
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
     std::string code = expression->get_code(fParent_blocks, fFunction);
 
+    // vérif type
+    Type expr_type = expression->get_expression_type(fParent_blocks);
+    if (expr_type != Type::INT && expr_type != Type::FLOAT){
+      throw std::logic_error("only an int or a float can be used in an unary expression");
+    }
+
     if (type == Unary_type::NOT){
       code += "cmpl $0, %eax \n\
 sete %al \n\
@@ -35,6 +41,10 @@ movzbl %al, %eax \n";
     return code;
   }
 
+  virtual Type get_expression_type(std::vector<Block*> fParent_blocks){
+
+    return expression->get_expression_type(fParent_blocks);
+  }
 
 private:
   Unary_type type;

@@ -33,12 +33,25 @@ public:
       code += index->get_code(fParent_blocks, fFunction);
       // on empile le resultat
       code += "pushl %eax\n";
+
+      //Verif type
+      if (index->get_expression_type(fParent_blocks) != Type::INT){
+	throw std::logic_error("variable " + identifier + " can't be an index");
+      }
     }
 
     Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
 
     code += expression->get_code(fParent_blocks, fFunction);
     
+    //Verif type
+    Type expr_type = expression->get_expression_type(fParent_blocks);
+    if (expr_type != Type::INT 
+	&& expr_type != Type::FLOAT 
+	&& expr_type != Type::POINTER){
+      throw std::logic_error("variable " + identifier + " can't be used in an assignment");
+    }
+
     if (index == nullptr){
       code += declaration_block->get_code_store_variable(identifier, "eax");
     }
@@ -52,7 +65,7 @@ public:
     return code;
   }
 
-
+ 
 private:
   std::string identifier;
   Expression* expression;

@@ -20,6 +20,19 @@ public:
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
 
 
+  // renvoie l'instruction assembleur correspondant au chargement d'une variable dans un registre
+  virtual std::string get_code_load_variable(std::string fIdentifier, std::string fRegister) override;
+
+  // renvoie l'instruction assembleur correspondant au chargement d'une case d'un tableau dans un registre
+  virtual std::string get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest) override;
+
+  // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une variable
+  virtual std::string get_code_store_variable(std::string fIdentifier, std::string fRegister) override;
+
+  // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une case de tableau
+  virtual std::string get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_value) override;
+
+
   void add_function(Function* fFunction);
   
   Declarator* get_function_declarator(std::string fIdentifier);

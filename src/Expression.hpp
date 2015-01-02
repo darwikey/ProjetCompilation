@@ -9,6 +9,7 @@
 #include "Block.hpp"
 
 
+
 class Expression : public Statement{
 public:
 
@@ -33,9 +34,13 @@ public:
     return declaration_block;
   }
 
-private:
+  
+  virtual Type get_expression_type(std::vector<Block*> fParent_blocks){
+    throw std::logic_error("internal error : Expression::get_expression_type() can't be called");
+  }
 
-
+protected:
+  
 };
 
 

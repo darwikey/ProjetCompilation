@@ -8,6 +8,10 @@
 #include "Statement.hpp"
 
 
+enum class Type{
+  INT, FLOAT, POINTER, FLOAT_POINTER, INT_ARRAY, FLOAT_ARRAY
+    };
+
 struct Declarator;
 
 /* block de declaration et d'instruction
@@ -22,6 +26,9 @@ public:
 
   // indique si une variable s'appelant fIdentifier est déclaré dans ce bloc
   virtual bool is_variable(std::string fIdentifier);
+
+  // retourne le type associé à la variable
+  virtual Type get_variable_type(std::string fIdentifier);
 
   // renvoie l'instruction assembleur correspondant au chargement d'une variable dans un registre
   virtual std::string get_code_load_variable(std::string fIdentifier, std::string fRegister);

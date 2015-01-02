@@ -4,6 +4,7 @@
 #include "Declarator.hpp"
 #include "Statement.hpp"
 #include <sstream>
+#include <iostream>
 
 
 std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
@@ -25,7 +26,8 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
     if (! var->is_function && var->stack_position == 0) {
       var->stack_position = position - 4;
       
-      if (var->structure == Declarator_structure::VARIABLE && var->type == Declarator_type::INT){
+      if ((var->structure == Declarator_structure::VARIABLE && var->type == Declarator_type::INT) 
+	  || var->structure == Declarator_structure::POINTER){
 	code += "pushl $0\n";
 	position -= 4;
       }
@@ -59,6 +61,37 @@ bool Block::is_variable(std::string fIdentifier){
 }
 
 
+Type Block::get_variable_type(std::string fIdentifier){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    if (it->second->structure == Declarator_structure::VARIABLE){
+      if (it->second->type == Declarator_type::INT)
+	return Type::INT;
+      if (it->second->type == Declarator_type::FLOAT)
+	return Type::FLOAT;
+    }
+    else if (it->second->structure == Declarator_structure::POINTER){
+      if (it->second->type == Declarator_type::FLOAT)	
+	return Type::FLOAT_POINTER;
+      else
+	return Type::POINTER;
+    }
+    else  if (it->second->structure == Declarator_structure::ARRAY){
+      if (it->second->type == Declarator_type::INT)
+	return Type::INT_ARRAY;
+      if (it->second->type == Declarator_type::FLOAT)
+	return Type::FLOAT_ARRAY;
+    }
+    
+    throw std::logic_error("variable " + fIdentifier + " can't be used in an expression");
+  }
+
+  throw std::logic_error("variable " + fIdentifier + " undeclared");
+  return Type::INT;
+}
+
+
 std::string Block::get_code_load_variable(std::string fIdentifier, std::string fRegister){
   auto it = variables.find(fIdentifier);
 
@@ -76,11 +109,22 @@ std::string Block::get_code_load_array(std::string fIdentifier, std::string fReg
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
-    if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
+    if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
-      int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
-      str << "movl " << address << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+
+      if (it->second->structure == Declarator_structure::ARRAY){
+	int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
+
+	str << "movl " << address << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      }
+      else if (it->second->structure == Declarator_structure::POINTER){
+	
+	str << "movl " << it->second->stack_position << "(%ebp), %edx\n";
+	str << "movl (%edx, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      }
+
       return str.str();
+
     }
   }
 
@@ -107,10 +151,20 @@ std::string Block::get_code_store_array(std::string fIdentifier, std::string fRe
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
-    if (it->second->structure != Declarator_structure::ARRAY || it->second->structure != Declarator_structure::POINTER){
+    if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
-      int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
-      str << "movl %" << fRegister_dest << ", " << address << "(%ebp" << ", %" << fRegister_index << ", 4)\n";
+
+      if (it->second->structure == Declarator_structure::ARRAY){
+	int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
+
+	str << "movl %" << fRegister_dest << ", " << address << "(%ebp, %" << fRegister_index << ", 4)\n";
+      }
+      else if (it->second->structure == Declarator_structure::POINTER){
+	
+	str << "movl " << it->second->stack_position << "(%ebp), %edx\n";
+	str << "movl %" << fRegister_dest << ", (%edx, %" << fRegister_index << ", 4)\n";
+      }
+
       return str.str();
     }
   }
