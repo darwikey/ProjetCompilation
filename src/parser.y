@@ -279,7 +279,7 @@ string file_name;
 extern "C"{
   int yyerror (char *s) {
     fflush (stdout);
-    cerr << file_name << ":l" << yylineno << ": " << s << endl;
+    cerr << file_name << ":L" << yylineno << ":C" << column << ": " << s << endl;
     return 0;
   }
 }
