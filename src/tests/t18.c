@@ -3,6 +3,6 @@ int f(int n) {
   return 1;
 }
 int main() {
-  printint(f(10));
+  printint(f(30));
   return 0;
 }

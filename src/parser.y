@@ -153,7 +153,7 @@ declaration
   $$ = $2;
   for (Declarator* it: *$2){
     it->type = $1;
-    cout << "new declarator : " << *it << endl;
+    //cout << "new declarator : " << *it << endl;
   }}
 ;
 
@@ -260,7 +260,7 @@ function_definition
 : type_name declarator compound_statement {
   $2->type = $1;
   $$ = new Function($2, $3);
-  cout << *$$ << endl;
+  //cout << *$$ << endl;
 }
 ;
 

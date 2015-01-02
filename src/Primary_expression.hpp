@@ -46,6 +46,10 @@ public:
       {
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
 	code += declaration_block->get_code_load_variable(identifier, "eax");
+
+	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
+	}
       }
       break;
 
@@ -85,6 +89,7 @@ public:
 	std::ostringstream str;
 	str << "addl $" << stack_size << " ,%esp\n";
 	code += str.str();
+
       }
       break;
 
@@ -94,6 +99,10 @@ public:
 	code += declaration_block->get_code_load_variable(identifier, "eax");
 	code += "incl %eax\n";
 	code += declaration_block->get_code_store_variable(identifier, "eax");
+
+	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
+	}
       }
       break;
 
@@ -103,6 +112,10 @@ public:
 	code += declaration_block->get_code_load_variable(identifier, "eax");
 	code += "decl %eax\n";
 	code += declaration_block->get_code_store_variable(identifier, "eax");
+
+	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
+	}
       }
       break;
 
@@ -112,12 +125,78 @@ public:
 
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
 	code += declaration_block->get_code_load_array(identifier, "eax", "eax");
+
+	if (this->get_expression_type(fParent_blocks) != Type::INT 
+	    && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
+	}
       }
 
       break;
     }
 
     return code;
+  }
+
+
+  virtual Type get_expression_type(std::vector<Block*> fParent_blocks) override{
+    switch(type){
+    case Primary_type::VARIABLE:
+    case Primary_type::INCREMENTED_VARIABLE:
+    case Primary_type::DECREMENTED_VARIABLE:
+      {
+	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
+	return declaration_block->get_variable_type(identifier);
+      }
+
+    case Primary_type::INT:
+      return Type::INT;
+
+    case Primary_type::FLOAT:
+      return Type::FLOAT;
+
+    case Primary_type::EXPRESSION:
+      return expression->get_expression_type(fParent_blocks);
+
+    case Primary_type::FUNCTION:
+      {
+	Main_block* main = dynamic_cast<Main_block*>(fParent_blocks[0]);
+	Declarator* ret = main->get_function_declarator(identifier);
+
+	if (ret->structure == Declarator_structure::VARIABLE){
+	  if (ret->type == Declarator_type::INT)
+	    return Type::INT;
+	  if (ret->type == Declarator_type::FLOAT)
+	    return Type::FLOAT;
+	}
+	else if (ret->structure == Declarator_structure::POINTER){
+	  if (ret->type == Declarator_type::FLOAT)	
+	    return Type::FLOAT_POINTER;
+	  else
+	    return Type::POINTER;
+	}
+	throw std::logic_error("function " + identifier + " doesn't return a valid type");
+      }
+
+    case Primary_type::ARRAY:
+      {
+	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
+	Type type = declaration_block->get_variable_type(identifier);
+
+	if (type == Type::INT_ARRAY)
+	  return Type::INT;
+	else if (type == Type::FLOAT_ARRAY)
+	  return Type::FLOAT;
+	else if (type == Type::POINTER)
+	  return Type::INT;
+	else if (type == Type::FLOAT_POINTER)
+	  return Type::FLOAT;
+	else
+	  throw std::logic_error("variable " + identifier + " is not an array");
+      }
+    }
+
+    return Type::INT;
   }
 
 

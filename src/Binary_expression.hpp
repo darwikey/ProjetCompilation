@@ -31,6 +31,14 @@ public:
     //on recupère le résultat de notre première expression
     code += "popl %eax\n";
     
+    // vérif types
+    Type expr_type1 = expression1->get_expression_type(fParent_blocks);
+    Type expr_type2 = expression2->get_expression_type(fParent_blocks);
+    if ((expr_type1 != Type::INT && expr_type1 != Type::FLOAT)
+	|| (expr_type2 != Type::INT && expr_type2 != Type::FLOAT)){
+      throw std::logic_error("only an int or a float can be used in a binary expression");
+    }
+
     switch(type){
     case Binary_type::MULTIPLICATION:
       code += "imul %ecx, %eax\n";
@@ -82,6 +90,11 @@ movzbl %al, %eax \n";
 
     }
     return code;
+  }
+
+
+  virtual Type get_expression_type(std::vector<Block*> fParent_blocks) override{
+    return expression1->get_expression_type(fParent_blocks);
   }
 
 

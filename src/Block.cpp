@@ -61,6 +61,37 @@ bool Block::is_variable(std::string fIdentifier){
 }
 
 
+Type Block::get_variable_type(std::string fIdentifier){
+  auto it = variables.find(fIdentifier);
+
+  if (it != variables.end()){
+    if (it->second->structure == Declarator_structure::VARIABLE){
+      if (it->second->type == Declarator_type::INT)
+	return Type::INT;
+      if (it->second->type == Declarator_type::FLOAT)
+	return Type::FLOAT;
+    }
+    else if (it->second->structure == Declarator_structure::POINTER){
+      if (it->second->type == Declarator_type::FLOAT)	
+	return Type::FLOAT_POINTER;
+      else
+	return Type::POINTER;
+    }
+    else  if (it->second->structure == Declarator_structure::ARRAY){
+      if (it->second->type == Declarator_type::INT)
+	return Type::INT_ARRAY;
+      if (it->second->type == Declarator_type::FLOAT)
+	return Type::FLOAT_ARRAY;
+    }
+    
+    throw std::logic_error("variable " + fIdentifier + " can't be used in an expression");
+  }
+
+  throw std::logic_error("variable " + fIdentifier + " undeclared");
+  return Type::INT;
+}
+
+
 std::string Block::get_code_load_variable(std::string fIdentifier, std::string fRegister){
   auto it = variables.find(fIdentifier);
 
