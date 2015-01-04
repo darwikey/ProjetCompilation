@@ -1,0 +1,41 @@
+\documentclass[a4paper,8pt,french,fleqn]{report}
+%Packages:
+
+%Langages:
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+%Mise en page
+\usepackage[top=2cm, right=2cm, bottom=2cm, left=2cm]{geometry}
+\usepackage{fancyhdr}
+\usepackage{enumerate}
+\usepackage{color}
+
+%Titre et auteurs
+\title{\textbf{Compilation}\\\textit{Rapport}}
+
+\author{PHILIPPI Alexande \& MAUPEU Xavier \& FIOT Arthur \& DEVOIR Loïc}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section*{Equipe}
+
+L'équipe est constituée de MAUPEU Xavier, FIOT Arthur, DEVOIR Loïc et PHILIPPI Alexandre. Tous les quatre nous sommes du groupe 4 de travaux dirigés, avec comme encadrant Mr. SERGENT Marc.
+
+\section*{Sujet}
+
+L'extension implémentée est la ``Boucle \textit{for} vectorielle'' via les deux pragmas : ``\#pragma omp simd'' et ``\#pragma omp simd reduction(+: id)''.
+La boucle \textit{for} ne devra comporter que des affectations et sera de la forme:\\
+$for (i=cst ; i<cst ;i++) \{ \\
+(instructions) \\
+\}\\$
+avec \textit{i} une variable quelconque et \textit{cst} des constantes quelconques.
+\end{document}
