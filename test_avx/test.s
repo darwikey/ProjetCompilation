@@ -17,10 +17,10 @@ main:
 	jmp cond
 
 loop:	
-	vmovups -8(%ebp), %ymm0
-	vmovups -8(%ebp), %ymm1
-	vaddps  %ymm0, %ymm1, %ymm2
-	vmovups %ymm2, -8(%ebp)
+	vmovss -8(%ebp), %xmm0
+	vmovss -8(%ebp), %xmm1
+	vaddps  %xmm0, %xmm1, %xmm2
+	vmovss %xmm2, -8(%ebp)
 
 	flds -8(%ebp)
 	fstpl (%esp)
@@ -28,9 +28,9 @@ loop:
 	call printf
 
 	addl $1, -4(%ebp)
-
+	
 cond:
-	cmpl $1023, -4(%ebp)
+	cmpl $20, -4(%ebp)
 	jle  loop
 	movl $0, %eax
 	leave
