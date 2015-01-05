@@ -91,9 +91,8 @@ std::string Main_block::get_code_load_array(std::string fIdentifier, std::string
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
-      //TODO FLOAT
       if (fVar_type == Type::FLOAT){
-	str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+	str << "movss "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
       }
       else{
 	str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
@@ -135,9 +134,8 @@ std::string Main_block::get_code_store_array(std::string fIdentifier, std::strin
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
-      //TODO FLOAT
       if (fVar_type == Type::FLOAT){    
-	str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+	str << "movss %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
       }
       else{
 	str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
