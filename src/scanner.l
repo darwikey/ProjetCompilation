@@ -18,6 +18,7 @@ L[a-zA-Z_]
 #include "Iteration.hpp"
 #include "While.hpp"
 #include "For.hpp"
+#include "Vectorized_for.hpp"
 #include "Jump.hpp"
 #include "parser.tab.h"
 

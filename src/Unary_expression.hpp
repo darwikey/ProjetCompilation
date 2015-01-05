@@ -20,7 +20,7 @@ public:
   }
   
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
     std::string code = expression->get_code(fParent_blocks, fFunction);
 
     // vérif type

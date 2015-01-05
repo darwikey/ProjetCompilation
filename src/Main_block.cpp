@@ -24,7 +24,7 @@ Main_block::Main_block(){
 }
 
 
-std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
+std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize){
   std::string code = get_header();
 
   fParent_blocks.push_back(static_cast<Block*>(this));

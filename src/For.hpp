@@ -12,14 +12,14 @@
 class For : public Iteration{
 public:
 
-  For(Expression* fArg1, Expression* fArg2, Expression* fArg3, Statement* fBody, bool fVectorized) : vectorized(fVectorized){
+  For(Expression* fArg1, Expression* fArg2, Expression* fArg3, Statement* fBody){
     arguments[0] = fArg1;
     arguments[1] = fArg2;
     arguments[2] = fArg3;
     body = fBody;
   }
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
     std::string code;
     std::string label1 = Iteration::get_unique_label();
     std::string label2 = Iteration::get_unique_label();
@@ -44,7 +44,6 @@ public:
 protected:
   Expression* arguments[3];
 
-  bool vectorized = false;
 };
 
 #endif

@@ -17,7 +17,7 @@ class Main_block : public Block{
 public:
   Main_block();
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override;
 
 
   // renvoie l'instruction assembleur correspondant au chargement d'une variable dans un registre

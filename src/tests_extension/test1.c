@@ -5,7 +5,7 @@ int main() {
   int i;
 	
 #pragma omp simd
-  for (i=0; i < 1000; i++) {
+  for (i=0; i < 16; i++) {
     a[i] = b[i] + 5.0;
   }
 

@@ -22,7 +22,7 @@ public:
   Block() {
   }
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override;
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override;
 
   // indique si une variable s'appelant fIdentifier est déclaré dans ce bloc
   virtual bool is_variable(std::string fIdentifier);

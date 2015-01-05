@@ -15,7 +15,7 @@ public:
   Jump(Expression* fExpression = nullptr) : expression(fExpression){
   }
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
     std::string code;
 
     if (expression != nullptr){

@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction){
+std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize){
   std::string code;
   
   // on ajoute les variables locales sur la pile

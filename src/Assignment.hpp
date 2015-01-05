@@ -25,7 +25,7 @@ public:
 								 index(fIndex){
   }
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
     std::string code;
     Type expr_type = expression->get_expression_type(fParent_blocks);
 
@@ -43,7 +43,7 @@ public:
 
     Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
 
-    code += expression->get_code(fParent_blocks, fFunction);
+    code += expression->get_code(fParent_blocks, fFunction, fVectorize);
     
     //Verif type
     if (expr_type != Type::INT 

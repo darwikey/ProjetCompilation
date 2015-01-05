@@ -16,7 +16,7 @@ public:
     body = fBody;
   }
 
-  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
+  virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
     std::string code;
     std::string label1 = Iteration::get_unique_label();
     std::string label2 = Iteration::get_unique_label();

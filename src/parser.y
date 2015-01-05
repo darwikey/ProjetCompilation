@@ -17,6 +17,7 @@
   #include "Iteration.hpp"
   #include "While.hpp"
   #include "For.hpp"
+  #include "Vectorized_for.hpp"
   #include "Jump.hpp"
   #include "Main_block.hpp"
 
@@ -237,9 +238,9 @@ selection_statement
 
 iteration_statement
 : WHILE '(' expression ')' statement {$$ = new While($3, $5);}
-| FOR '(' expression_statement expression_statement expression ')' statement {$$ = new For($3, $4, $5, $7, false);}
-| PRAGMA_SIMD FOR '(' expression_statement expression_statement expression ')' statement {
-  $$ = new For($4, $5, $6, $8, true);
+| FOR '(' expression_statement expression_statement expression ')' statement {$$ = new For($3, $4, $5, $7);}
+| PRAGMA_SIMD FOR '(' IDENTIFIER '=' ICONSTANT ';' IDENTIFIER '<' ICONSTANT ';' IDENTIFIER INC_OP ')' statement {
+  $$ = new Vectorized_for(*$4, $6, $10, $15);
   cout<<"for loop vectorized\n";}
 ;
 
