@@ -57,7 +57,9 @@ std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* f
   code += "\n";
   
   // declaration des valeurs des floats
-  code += ".data\n" + code_data_float;
+  code += ".data\n";
+  code += "ZERO: .float 0.0, 0.0, 0.0, 0.0\n"; // pour les négations
+  code += code_data_float;
 
   return code;
 }

@@ -30,12 +30,20 @@ public:
     }
 
     if (type == Unary_type::NOT){
+      //TODO FLOAT
       code += "cmpl $0, %eax \n\
 sete %al \n\
 movzbl %al, %eax \n";
     }
     else if (type == Unary_type::NEGATIVE){
-      code += "negl %eax\n";
+      if (expr_type == Type::FLOAT){
+	code += "movups ZERO, %xmm1 \n";
+	code += "subps %xmm0, %xmm1 \n";
+	code += "movups %xmm1, %xmm0 \n";
+      }
+      else{
+	code += "negl %eax\n";
+      }
     }
 
     return code;
