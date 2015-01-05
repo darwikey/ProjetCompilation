@@ -53,13 +53,13 @@ public:
     }
 
     if (index == nullptr){
-      code += declaration_block->get_code_store_variable(identifier, "eax");
+      code += declaration_block->get_code_store_variable(identifier, "eax", expr_type);
     }
     else{
       code += "movl %eax, %ecx \n";
       //on recupère l'index
       code += "popl %eax\n";
-      code += declaration_block->get_code_store_array(identifier, "eax", "ecx");
+      code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type);
     }
 
     return code;

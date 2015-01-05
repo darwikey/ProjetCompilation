@@ -4,6 +4,7 @@
 #include "Function.hpp"
 #include "Declarator.hpp"
 
+std::string Main_block::code_data_float = std::string();
 
 Main_block::Main_block(){
   // enregistrement des prototypes de printint() et printfloat()
@@ -53,17 +54,26 @@ std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* f
     code += f.second->get_code(fParent_blocks);
   }
 
+  code += "\n";
+  
+  // declaration des valeurs des floats
+  code += ".data\n" + code_data_float;
 
   return code;
 }
 
 
-std::string Main_block::get_code_load_variable(std::string fIdentifier, std::string fRegister){
+std::string Main_block::get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
-    str << "movl " << fIdentifier << ", %" << fRegister << "\n";
+    if (fVar_type == Type::FLOAT){
+      str << "movss " << fIdentifier << ", %" << fRegister << "\n";
+    }
+    else{
+      str << "movl " << fIdentifier << ", %" << fRegister << "\n";
+    }
     return str.str();
   }
 
@@ -72,14 +82,20 @@ std::string Main_block::get_code_load_variable(std::string fIdentifier, std::str
 }
 
 
-std::string Main_block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest){
+std::string Main_block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
-      str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      //TODO FLOAT
+      if (fVar_type == Type::FLOAT){
+	str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      }
+      else{
+	str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+      }
 
       return str.str();
 
@@ -91,12 +107,17 @@ std::string Main_block::get_code_load_array(std::string fIdentifier, std::string
 }
 
 
-std::string Main_block::get_code_store_variable(std::string fIdentifier, std::string fRegister){
+std::string Main_block::get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
-    str << "movl %" << fRegister << ", " << fIdentifier << "\n";
+    if (fVar_type == Type::FLOAT){    
+      str << "movss %" << fRegister << ", " << fIdentifier << "\n";
+    }
+    else{
+      str << "movl %" << fRegister << ", " << fIdentifier << "\n";
+    }
     return str.str();
   }
 
@@ -105,20 +126,40 @@ std::string Main_block::get_code_store_variable(std::string fIdentifier, std::st
 }
 
 
-std::string Main_block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest){
+std::string Main_block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
-      str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+      //TODO FLOAT
+      if (fVar_type == Type::FLOAT){    
+	str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+      }
+      else{
+	str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+      }
       return str.str();
     }
   }
 
   throw std::logic_error(fIdentifier + " undeclared or is not an array or a pointer");
   return "";
+}
+
+
+std::string Main_block::get_code_load_float(float fValue){
+  static int counter = 0;
+  std::ostringstream str1, str2;
+
+  str1 << "FLT" << counter << ": .float " << fValue << ", 0.0, 0.0, 0.0\n";
+  code_data_float += str1.str();
+
+  str2 << "movups FLT" << counter << ", %xmm0\n";
+  
+  counter++;
+  return str2.str();
 }
 
 
@@ -147,10 +188,12 @@ printfloat: \n\
    pushl   %ebp \n\
    movl    %esp, %ebp \n\
    \n\
-   pushl   8(%ebp) \n\
+   subl    $8, %esp \n\
+   flds    8(%ebp) \n\
+   fstpl   (%esp) \n\
    pushl   $__STR_PRINT_FLOAT \n\
    call    printf \n\
-   addl    $8, %esp \n\
+   addl    $12, %esp \n\
    \n\
    leave \n\
    ret \n\n";

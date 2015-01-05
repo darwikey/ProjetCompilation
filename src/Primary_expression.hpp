@@ -45,9 +45,15 @@ public:
     case Primary_type::VARIABLE:
       {
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
-	code += declaration_block->get_code_load_variable(identifier, "eax");
+	Type var_type = this->get_expression_type(fParent_blocks);
 
-	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	if (var_type == Type::INT){
+	  code += declaration_block->get_code_load_variable(identifier, "eax", var_type); 
+	}
+	else if (var_type == Type::FLOAT){
+	  code += declaration_block->get_code_load_variable(identifier, "xmm0", var_type);
+	}
+	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
 	}
       }
@@ -62,7 +68,9 @@ public:
       break;
 
     case Primary_type::FLOAT:
-      //TODO
+      {
+	code += Main_block::get_code_load_float(float_value);
+      }
       break;
 
     case Primary_type::EXPRESSION:
@@ -96,11 +104,18 @@ public:
     case Primary_type::INCREMENTED_VARIABLE:
       {
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
-	code += declaration_block->get_code_load_variable(identifier, "eax");
-	code += "incl %eax\n";
-	code += declaration_block->get_code_store_variable(identifier, "eax");
+	Type var_type = this->get_expression_type(fParent_blocks);
 
-	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	if (var_type == Type::INT){
+	  code += declaration_block->get_code_load_variable(identifier, "eax", var_type);
+	  code += "incl %eax\n";
+	  code += declaration_block->get_code_store_variable(identifier, "eax", var_type);
+	}
+	else if (var_type == Type::FLOAT){
+	  //TODO
+	  code += declaration_block->get_code_load_variable(identifier, "xmm0", var_type);
+	}
+	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
 	}
       }
@@ -109,11 +124,18 @@ public:
     case Primary_type::DECREMENTED_VARIABLE:
       {
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
-	code += declaration_block->get_code_load_variable(identifier, "eax");
-	code += "decl %eax\n";
-	code += declaration_block->get_code_store_variable(identifier, "eax");
+	Type var_type = this->get_expression_type(fParent_blocks);
 
-	if (this->get_expression_type(fParent_blocks) != Type::INT && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	if (var_type == Type::INT){
+	  code += declaration_block->get_code_load_variable(identifier, "eax", var_type);
+	  code += "decl %eax\n";
+	  code += declaration_block->get_code_store_variable(identifier, "eax", var_type);
+	}
+	else if (var_type == Type::FLOAT){
+	  //TODO
+	  code += declaration_block->get_code_load_variable(identifier, "xmm0", var_type);
+	}
+	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
 	}
       }
@@ -124,12 +146,20 @@ public:
 	code += expression->get_code(fParent_blocks, fFunction);
 
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
-	code += declaration_block->get_code_load_array(identifier, "eax", "eax");
 
-	if (this->get_expression_type(fParent_blocks) != Type::INT 
-	    && this->get_expression_type(fParent_blocks) != Type::FLOAT){
+	Type var_type = this->get_expression_type(fParent_blocks);
+
+	if (var_type == Type::INT){
+	  code += declaration_block->get_code_load_array(identifier, "eax", "eax", var_type);
+	}
+	else if (var_type == Type::FLOAT){
+	  //TODO
+	  code += declaration_block->get_code_load_array(identifier, "eax", "eax", var_type);
+	}
+	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
 	}
+    
       }
 
       break;

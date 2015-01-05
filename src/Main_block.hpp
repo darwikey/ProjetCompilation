@@ -21,17 +21,19 @@ public:
 
 
   // renvoie l'instruction assembleur correspondant au chargement d'une variable dans un registre
-  virtual std::string get_code_load_variable(std::string fIdentifier, std::string fRegister) override;
+  virtual std::string get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type) override;
 
   // renvoie l'instruction assembleur correspondant au chargement d'une case d'un tableau dans un registre
-  virtual std::string get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest) override;
+  virtual std::string get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type) override;
 
   // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une variable
-  virtual std::string get_code_store_variable(std::string fIdentifier, std::string fRegister) override;
+  virtual std::string get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type) override;
 
   // renvoie l'instruction assembleur correspondant au stockage d'un registre dans une case de tableau
-  virtual std::string get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_value) override;
+  virtual std::string get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_value, Type fVar_type) override;
 
+  //charge un float dans le registre xmm0
+  static std::string get_code_load_float(float fValue);
 
   void add_function(Function* fFunction);
   
@@ -43,6 +45,8 @@ private:
   std::string get_header();
 
   std::map<std::string, Function*> functions;
+
+  static std::string code_data_float;
 };
 
 
