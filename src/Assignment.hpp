@@ -27,12 +27,13 @@ public:
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction) override {
     std::string code;
+    Type expr_type = expression->get_expression_type(fParent_blocks);
 
     // cas d'un tableau
     if (index != nullptr){
       code += index->get_code(fParent_blocks, fFunction);
       // on empile le resultat
-      code += "pushl %eax\n";//TODO FLOAT
+      code += "pushl %eax\n";
 
       //Verif type
       if (index->get_expression_type(fParent_blocks) != Type::INT){
@@ -45,7 +46,6 @@ public:
     code += expression->get_code(fParent_blocks, fFunction);
     
     //Verif type
-    Type expr_type = expression->get_expression_type(fParent_blocks);
     if (expr_type != Type::INT 
 	&& expr_type != Type::FLOAT 
 	&& expr_type != Type::POINTER){
@@ -61,16 +61,14 @@ public:
       }
     }
     else{
+      code += "movl %eax, %ecx \n";
+      //on recupère l'index
+      code += "popl %eax\n";
+
       if (expr_type == Type::FLOAT){
-	code += "movl %xmm0, %xmm1 \n";
-	//on recupère l'index
-	code += "popl %xmm0\n";//TODO
-	code += declaration_block->get_code_store_array(identifier, "xmm0", "xmm1", expr_type);
+	code += declaration_block->get_code_store_array(identifier, "eax", "xmm0", expr_type);
       }
       else{
-	code += "movl %eax, %ecx \n";
-	//on recupère l'index
-	code += "popl %eax\n";
 	code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type);
 	}
     }

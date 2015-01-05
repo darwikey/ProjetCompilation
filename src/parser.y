@@ -38,7 +38,7 @@
 %token <float_num> FCONSTANT
 %token INC_OP DEC_OP LE_OP GE_OP EQ_OP NE_OP
 %token INT FLOAT VOID
-%token IF ELSE WHILE RETURN FOR
+%token IF ELSE WHILE RETURN FOR PRAGMA_SIMD REDUCTION
 
 %type <type> type_name 
 %type <declarator> declarator parameter_declaration
@@ -237,7 +237,10 @@ selection_statement
 
 iteration_statement
 : WHILE '(' expression ')' statement {$$ = new While($3, $5);}
-| FOR '(' expression_statement expression_statement expression ')' statement {$$ = new For($3, $4, $5, $7);}
+| FOR '(' expression_statement expression_statement expression ')' statement {$$ = new For($3, $4, $5, $7, false);}
+| PRAGMA_SIMD FOR '(' expression_statement expression_statement expression ')' statement {
+  $$ = new For($4, $5, $6, $8, true);
+  cout<<"for loop vectorized\n";}
 ;
 
 jump_statement

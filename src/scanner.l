@@ -45,6 +45,8 @@ int check_type ();
 "void"		{ count(); return(VOID); }
 "while"		{ count(); return(WHILE); }
 "for"		{ count(); return(FOR); }
+"#pragma omp simd" {count(); return(PRAGMA_SIMD);}
+"reduction"     { count(); return(REDUCTION); }
 
 {L}({L}|{D})*	{ count(); yylval.str=new std::string(yytext); return(IDENTIFIER); }
 

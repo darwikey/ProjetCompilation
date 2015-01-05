@@ -1,12 +1,13 @@
-float f() {
-  int a;
+float f(float a) {
   float b;
-  a=1000;
-  b=20123;
-  return a+b*3-8;
+  b=1000.0;
+  
+  return a+b*3.0;
 }
 int main() {
   float a;
-  a=f();
+  a = 8.0 - 5.0;
+  printfloat(f(a));
+  
   return 0;
 }

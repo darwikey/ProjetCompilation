@@ -160,8 +160,7 @@ public:
 	  code += declaration_block->get_code_load_array(identifier, "eax", "eax", var_type);
 	}
 	else if (var_type == Type::FLOAT){
-	  //TODO
-	  code += declaration_block->get_code_load_array(identifier, "eax", "eax", var_type);
+	  code += declaration_block->get_code_load_array(identifier, "eax", "xmm0", var_type);
 	}
 	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");

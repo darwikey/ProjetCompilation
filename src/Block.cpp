@@ -119,16 +119,20 @@ std::string Block::get_code_load_array(std::string fIdentifier, std::string fReg
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
       
-      //TODO FLOAT
+      std::string mov_instr = "movl";
+      if (fVar_type == Type::FLOAT){
+	mov_instr = "movss";
+      }
+
       if (it->second->structure == Declarator_structure::ARRAY){
 	int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
 
-	str << "movl " << address << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+	str << mov_instr << " " << address << "(%ebp" << ", %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
       }
       else if (it->second->structure == Declarator_structure::POINTER){
 	
-	str << "movl " << it->second->stack_position << "(%ebp), %edx\n";
-	str << "movl (%edx, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+	str << mov_instr << " " << it->second->stack_position << "(%ebp), %edx\n";
+	str << mov_instr << " (%edx, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
       }
 
       return str.str();
@@ -167,16 +171,20 @@ std::string Block::get_code_store_array(std::string fIdentifier, std::string fRe
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
-      //TODO FLOAT
+      std::string mov_instr = "movl";
+      if (fVar_type == Type::FLOAT){
+	mov_instr = "movss";
+      }
+
       if (it->second->structure == Declarator_structure::ARRAY){
 	int address = it->second->stack_position - 4 * ((int)it->second->array_size - 1);
 
-	str << "movl %" << fRegister_dest << ", " << address << "(%ebp, %" << fRegister_index << ", 4)\n";
+	str << mov_instr << " %" << fRegister_dest << ", " << address << "(%ebp, %" << fRegister_index << ", 4)\n";
       }
       else if (it->second->structure == Declarator_structure::POINTER){
 	
-	str << "movl " << it->second->stack_position << "(%ebp), %edx\n";
-	str << "movl %" << fRegister_dest << ", (%edx, %" << fRegister_index << ", 4)\n";
+	str << mov_instr << " " << it->second->stack_position << "(%ebp), %edx\n";
+	str << mov_instr << " %" << fRegister_dest << ", (%edx, %" << fRegister_index << ", 4)\n";
       }
 
       return str.str();

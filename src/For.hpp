@@ -12,7 +12,7 @@
 class For : public Iteration{
 public:
 
-  For(Expression* fArg1, Expression* fArg2, Expression* fArg3, Statement* fBody){
+  For(Expression* fArg1, Expression* fArg2, Expression* fArg3, Statement* fBody, bool fVectorized) : vectorized(fVectorized){
     arguments[0] = fArg1;
     arguments[1] = fArg2;
     arguments[2] = fArg3;
@@ -41,9 +41,10 @@ public:
   }
 
 
-private:
+protected:
   Expression* arguments[3];
 
+  bool vectorized = false;
 };
 
 #endif
