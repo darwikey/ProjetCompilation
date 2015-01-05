@@ -86,9 +86,16 @@ public:
 	// parcours du conteneur dans le sens inverse
 	for (auto expr = function_parameter.rbegin(); expr != function_parameter.rend(); ++expr){
 	  code += (*expr)->get_code(fParent_blocks, fFunction);
-	  //TODO verif type
 	  
-	  code += "pushl %eax\n";
+	  Type expr_type = (*expr)->get_expression_type(fParent_blocks);
+	  //TODO verif type
+	  if (expr_type == Type::FLOAT){
+	    code += "subl $4, %esp\n";
+	    code += "movss %xmm0, (%esp)\n";
+	  }
+	  else{
+	    code += "pushl %eax\n";
+	  }
 	  stack_size += 4;
 	}
 

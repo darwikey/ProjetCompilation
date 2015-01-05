@@ -32,7 +32,7 @@ public:
     if (index != nullptr){
       code += index->get_code(fParent_blocks, fFunction);
       // on empile le resultat
-      code += "pushl %eax\n";
+      code += "pushl %eax\n";//TODO FLOAT
 
       //Verif type
       if (index->get_expression_type(fParent_blocks) != Type::INT){
@@ -53,13 +53,26 @@ public:
     }
 
     if (index == nullptr){
-      code += declaration_block->get_code_store_variable(identifier, "eax", expr_type);
+      if (expr_type == Type::FLOAT){
+	code += declaration_block->get_code_store_variable(identifier, "xmm0", expr_type);
+      }
+      else{
+	code += declaration_block->get_code_store_variable(identifier, "eax", expr_type);
+      }
     }
     else{
-      code += "movl %eax, %ecx \n";
-      //on recupère l'index
-      code += "popl %eax\n";
-      code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type);
+      if (expr_type == Type::FLOAT){
+	code += "movl %xmm0, %xmm1 \n";
+	//on recupère l'index
+	code += "popl %xmm0\n";//TODO
+	code += declaration_block->get_code_store_array(identifier, "xmm0", "xmm1", expr_type);
+      }
+      else{
+	code += "movl %eax, %ecx \n";
+	//on recupère l'index
+	code += "popl %eax\n";
+	code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type);
+	}
     }
 
     return code;
