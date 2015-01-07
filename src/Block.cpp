@@ -49,7 +49,7 @@ std::string Block::get_code(std::vector<Block*> fParent_blocks, Function* fFunct
   top_stack_position = position;
 
   for (Statement* s : statements){
-    code += s->get_code(fParent_blocks, fFunction);
+    code += s->get_code(fParent_blocks, fFunction, fVectorize);
   }
 
   return code;
@@ -94,13 +94,17 @@ Type Block::get_variable_type(std::string fIdentifier){
 }
 
 
-std::string Block::get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
+std::string Block::get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
     if (fVar_type == Type::FLOAT){
       str << "movss " << it->second->stack_position << "(%ebp), %" << fRegister << "\n";
+      if (fVectorize){
+	// recopie le premier élément du vecteur sur les autres éléments du vecteur
+	str << "shufps $0x00, %" << fRegister << ", %" << fRegister;
+      }
     }
     else{
       str << "movl " << it->second->stack_position << "(%ebp), %" << fRegister << "\n";
@@ -112,7 +116,7 @@ std::string Block::get_code_load_variable(std::string fIdentifier, std::string f
   return "";
 }
 
-std::string Block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
+std::string Block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
@@ -121,7 +125,12 @@ std::string Block::get_code_load_array(std::string fIdentifier, std::string fReg
       
       std::string mov_instr = "movl";
       if (fVar_type == Type::FLOAT){
-	mov_instr = "movss";
+	if (fVectorize){
+	  mov_instr = "movups";
+	}
+	else{
+	  mov_instr = "movss";
+	}
       }
 
       if (it->second->structure == Declarator_structure::ARRAY){
@@ -164,7 +173,7 @@ std::string Block::get_code_store_variable(std::string fIdentifier, std::string 
 }
 
 
-std::string Block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
+std::string Block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
@@ -173,7 +182,12 @@ std::string Block::get_code_store_array(std::string fIdentifier, std::string fRe
 
       std::string mov_instr = "movl";
       if (fVar_type == Type::FLOAT){
-	mov_instr = "movss";
+	if (fVectorize){
+	  mov_instr = "movups";
+	}
+	else{
+	  mov_instr = "movss";
+	}
       }
 
       if (it->second->structure == Declarator_structure::ARRAY){

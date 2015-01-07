@@ -65,17 +65,23 @@ std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* f
 }
 
 
-std::string Main_block::get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
+std::string Main_block::get_code_load_variable(std::string fIdentifier, std::string fRegister, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
     if (fVar_type == Type::FLOAT){
       str << "movss " << fIdentifier << ", %" << fRegister << "\n";
+      
+      if (fVectorize){
+	// recopie le premier élément du vecteur sur les autres éléments du vecteur
+	str << "shufps $0x00, %" << fRegister << ", %" << fRegister;
+      }
     }
     else{
       str << "movl " << fIdentifier << ", %" << fRegister << "\n";
     }
+
     return str.str();
   }
 
@@ -84,19 +90,24 @@ std::string Main_block::get_code_load_variable(std::string fIdentifier, std::str
 }
 
 
-std::string Main_block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
+std::string Main_block::get_code_load_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
 
+      std::string mov_instr = "movl";
       if (fVar_type == Type::FLOAT){
-	str << "movss "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
+	if (fVectorize){
+	  mov_instr = "movups";
+	}
+	else{
+	  mov_instr = "movss";
+	}
       }
-      else{
-	str << "movl "<< fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";
-      }
+
+      str << mov_instr << " " << fIdentifier << "(, %" << fRegister_index << ", 4), %" << fRegister_dest << "\n";     
 
       return str.str();
 
@@ -127,12 +138,22 @@ std::string Main_block::get_code_store_variable(std::string fIdentifier, std::st
 }
 
 
-std::string Main_block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type){
+std::string Main_block::get_code_store_array(std::string fIdentifier, std::string fRegister_index, std::string fRegister_dest, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     if (it->second->structure == Declarator_structure::ARRAY || it->second->structure == Declarator_structure::POINTER){
       std::ostringstream str;
+
+      std::string mov_instr = "movl";
+      if (fVar_type == Type::FLOAT){
+	if (fVectorize){
+	  mov_instr = "movups";
+	}
+	else{
+	  mov_instr = "movss";
+	}
+      }
 
       if (fVar_type == Type::FLOAT){    
 	str << "movss %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";

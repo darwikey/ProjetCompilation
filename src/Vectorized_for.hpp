@@ -32,7 +32,7 @@ public:
     code += "jmp " + label1 + "\n";
     code += label2 + ":\n";
     
-    code += body->get_code(fParent_blocks, fFunction);
+    code += body->get_code(fParent_blocks, fFunction, true);
     
     // increment iterator
     code += declaration_block->get_code_load_variable(iterator, "eax", Type::INT);

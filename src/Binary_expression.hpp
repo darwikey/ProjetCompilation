@@ -22,7 +22,7 @@ public:
   
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
-    std::string code = expression1->get_code(fParent_blocks, fFunction);
+    std::string code = expression1->get_code(fParent_blocks, fFunction, fVectorize);
     
     // vérif types
     Type expr_type1 = expression1->get_expression_type(fParent_blocks);
@@ -34,7 +34,7 @@ public:
       // on empile le resultat
       code += "pushl %eax\n";
       
-      code += expression2->get_code(fParent_blocks, fFunction);
+      code += expression2->get_code(fParent_blocks, fFunction, fVectorize);
       code += "movl %eax, %ecx \n";
       //on recupère le résultat de notre première expression
       code += "popl %eax\n";
@@ -97,7 +97,7 @@ movzbl %al, %eax \n";
       code += "subl $16, %esp \n";
       code += "movups %xmm0, (%esp) \n";
       
-      code += expression2->get_code(fParent_blocks, fFunction);
+      code += expression2->get_code(fParent_blocks, fFunction, fVectorize);
       code += "movups %xmm0, %xmm1 \n";
       //on recupère le résultat de notre première expression
       code += "movups (%esp), %xmm0 \n";

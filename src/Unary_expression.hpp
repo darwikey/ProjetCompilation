@@ -21,7 +21,7 @@ public:
   
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
-    std::string code = expression->get_code(fParent_blocks, fFunction);
+    std::string code = expression->get_code(fParent_blocks, fFunction, fVectorize);
 
     // vérif type
     Type expr_type = expression->get_expression_type(fParent_blocks);
@@ -30,7 +30,10 @@ public:
     }
 
     if (type == Unary_type::NOT){
-      //TODO FLOAT
+      if (expr_type == Type::FLOAT){
+	throw std::logic_error("operand NOT can't be use with float");
+      }
+
       code += "cmpl $0, %eax \n\
 sete %al \n\
 movzbl %al, %eax \n";

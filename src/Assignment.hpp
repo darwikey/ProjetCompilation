@@ -52,6 +52,7 @@ public:
       throw std::logic_error("variable " + identifier + " can't be used in an assignment");
     }
 
+    //*** Variable ***
     if (index == nullptr){
       if (expr_type == Type::FLOAT){
 	code += declaration_block->get_code_store_variable(identifier, "xmm0", expr_type);
@@ -60,17 +61,18 @@ public:
 	code += declaration_block->get_code_store_variable(identifier, "eax", expr_type);
       }
     }
+    //*** Tableau ***
     else{
       code += "movl %eax, %ecx \n";
       //on recupère l'index
       code += "popl %eax\n";
 
       if (expr_type == Type::FLOAT){
-	code += declaration_block->get_code_store_array(identifier, "eax", "xmm0", expr_type);
+	code += declaration_block->get_code_store_array(identifier, "eax", "xmm0", expr_type, fVectorize);
       }
       else{
-	code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type);
-	}
+	code += declaration_block->get_code_store_array(identifier, "eax", "ecx", expr_type, fVectorize);
+      }
     }
 
     return code;
