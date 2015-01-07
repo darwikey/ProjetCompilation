@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 #include "Expression.hpp"
 #include "Main_block.hpp"
 
@@ -86,12 +87,34 @@ public:
 	Declarator* function = main->get_function_declarator(identifier);
 	int stack_size = 0;
 
+	if (function_parameter.size() != function->parameter_list.size()){
+	  throw std::logic_error("not the same number of arguments for " + function->name);
+	}
+
 	// parcours du conteneur dans le sens inverse
+	auto function_param = function->parameter_list.rbegin();
 	for (auto expr = function_parameter.rbegin(); expr != function_parameter.rend(); ++expr){
 	  code += (*expr)->get_code(fParent_blocks, fFunction, fVectorize);
 	  
-	  Type expr_type = (*expr)->get_expression_type(fParent_blocks);
-	  //TODO verif type
+	 
+	  //*** verif type ***
+	  Type expr_type = (*expr)->get_expression_type(fParent_blocks);	 
+	  bool error_param = false;
+	  if ((*function_param)->structure == Declarator_structure::VARIABLE){
+	    if (((*function_param)->type == Declarator_type::INT && expr_type != Type::INT) 
+		|| ((*function_param)->type == Declarator_type::FLOAT && expr_type != Type::FLOAT)){
+	      error_param = true;
+	    }
+	  }
+	  else if ((*function_param)->structure == Declarator_structure::POINTER && expr_type != Type::POINTER && expr_type != Type::FLOAT_POINTER){
+	    error_param = true;
+	  }
+
+	  if (error_param){
+	    throw std::logic_error("bad type of arguments for " + function->name);
+	  }
+
+	  //*** Ajout des paramètres sur la pile ****
 	  if (expr_type == Type::FLOAT){
 	    code += "subl $4, %esp\n";
 	    code += "movss %xmm0, (%esp)\n";
@@ -100,6 +123,8 @@ public:
 	    code += "pushl %eax\n";
 	  }
 	  stack_size += 4;
+
+	  ++function_param;
 	}
 
 	code += "call " + function->name + "\n";
@@ -108,6 +133,16 @@ public:
 	str << "addl $" << stack_size << " ,%esp\n";
 	code += str.str();
 
+	// si la fonction retourne un float on alloue de la place sur la pile, on copie le resultat dessus, puis on bouge ce float dans %xmm0
+	if (function->type == Declarator_type::FLOAT && function->structure == Declarator_structure::VARIABLE){
+	  code += "subl $4, %esp\n";
+	  code += "fstps (%esp)\n";
+	  code += "movss (%esp), %xmm0\n";
+	  code += "add $4, %esp\n";
+	  if (fVectorize){
+	    code += "shufps $0x00, %xmm0, %xmm0\n";
+	  }
+	}
       }
       break;
 
@@ -122,8 +157,10 @@ public:
 	  code += declaration_block->get_code_store_variable(identifier, "eax", var_type);
 	}
 	else if (var_type == Type::FLOAT){
-	  //TODO
 	  code += declaration_block->get_code_load_variable(identifier, "xmm0", var_type, fVectorize);
+	  code += "movups ONE, %xmm1\n";
+	  code += "addps %xmm1, %xmm0\n";
+	  code += declaration_block->get_code_store_variable(identifier, "xmm0", var_type);
 	}
 	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");
@@ -142,8 +179,10 @@ public:
 	  code += declaration_block->get_code_store_variable(identifier, "eax", var_type);
 	}
 	else if (var_type == Type::FLOAT){
-	  //TODO
 	  code += declaration_block->get_code_load_variable(identifier, "xmm0", var_type, fVectorize);
+	  code += "movups ONE, %xmm1\n";
+	  code += "subps %xmm1, %xmm0\n";
+	  code += declaration_block->get_code_store_variable(identifier, "xmm0", var_type);
 	}
 	else{
 	  throw std::logic_error("variable " + identifier + " can't be used in an expression");

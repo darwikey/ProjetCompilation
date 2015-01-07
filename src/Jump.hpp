@@ -21,6 +21,14 @@ public:
     if (expression != nullptr){
       code += expression->get_code(fParent_blocks, fFunction);
     }
+
+    // Si on retourne un float on l'empile sur la pile des floats
+    if (expression->get_expression_type(fParent_blocks) == Type::FLOAT){
+      code += "subl $4, %esp\n";
+      code += "movss %xmm0, (%esp)\n";
+      code += "flds (%esp)\n";
+      code += "add $4, %esp\n";
+    }
       
     // fin de la fonction
     code += "leave\n";

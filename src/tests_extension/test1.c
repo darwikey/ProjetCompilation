@@ -12,8 +12,8 @@ int main() {
     a[i] = b[i] + 5.0;
   }
 
-    for (i=0; i < 16; i++)
-      printfloat(a[i]);
+  for (i=0; i < 16; i++)
+    printfloat(a[i]);
 
   return 0;
 }

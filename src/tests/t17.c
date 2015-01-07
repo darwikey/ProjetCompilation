@@ -7,6 +7,7 @@ float f(float x) {
 }
 int main() {
   float a;
+  a = 0.001;
   printfloat(f(a));
   return 0;
 }
