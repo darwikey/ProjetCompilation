@@ -21,6 +21,7 @@ public:
     if (expression != nullptr){
       code += expression->get_code(fParent_blocks, fFunction);
     }
+    //TODO verif type
 
     // Si on retourne un float on l'empile sur la pile des floats
     if (expression->get_expression_type(fParent_blocks) == Type::FLOAT){

@@ -103,7 +103,7 @@ std::string Block::get_code_load_variable(std::string fIdentifier, std::string f
       str << "movss " << it->second->stack_position << "(%ebp), %" << fRegister << "\n";
       if (fVectorize){
 	// recopie le premier élément du vecteur sur les autres éléments du vecteur
-	str << "shufps $0x00, %" << fRegister << ", %" << fRegister;
+	str << "shufps $0x00, %" << fRegister << ", %" << fRegister << "\n";
       }
     }
     else{
@@ -154,12 +154,17 @@ std::string Block::get_code_load_array(std::string fIdentifier, std::string fReg
 }
 
 
-std::string Block::get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
+std::string Block::get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
     if (fVar_type == Type::FLOAT){
+      if (fVectorize){
+	// somme tous les éléments du registre entre eux
+	str << "haddps %" << fRegister << ", %" << fRegister << "\n";
+	std::cout<<"plop\n";
+      }
       str << "movss %" << fRegister << ", " << it->second->stack_position << "(%ebp)\n";
     }
     else{

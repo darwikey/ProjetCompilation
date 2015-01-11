@@ -35,7 +35,7 @@ std::string Main_block::get_code(std::vector<Block*> fParent_blocks, Function* f
 
     if (! var->is_function) {
       int var_size = 4;
-      if (var->structure == Declarator_structure::ARRAY && var->type == Declarator_type::INT){
+      if (var->structure == Declarator_structure::ARRAY){
 	
 	var_size = 4 * var->array_size;
       }
@@ -76,7 +76,7 @@ std::string Main_block::get_code_load_variable(std::string fIdentifier, std::str
       
       if (fVectorize){
 	// recopie le premier élément du vecteur sur les autres éléments du vecteur
-	str << "shufps $0x00, %" << fRegister << ", %" << fRegister;
+	str << "shufps $0x00, %" << fRegister << ", %" << fRegister << "\n";
       }
     }
     else{
@@ -120,12 +120,16 @@ std::string Main_block::get_code_load_array(std::string fIdentifier, std::string
 }
 
 
-std::string Main_block::get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type){
+std::string Main_block::get_code_store_variable(std::string fIdentifier, std::string fRegister, Type fVar_type, bool fVectorize){
   auto it = variables.find(fIdentifier);
 
   if (it != variables.end()){
     std::ostringstream str;
-    if (fVar_type == Type::FLOAT){    
+    if (fVar_type == Type::FLOAT){
+      if (fVectorize){
+	// somme tous les éléments du registre entre eux
+	str << "haddps %" << fRegister << ", %" << fRegister << "\n";
+      }
       str << "movss %" << fRegister << ", " << fIdentifier << "\n";
     }
     else{
@@ -157,10 +161,10 @@ std::string Main_block::get_code_store_array(std::string fIdentifier, std::strin
       }
 
       if (fVar_type == Type::FLOAT){    
-	str << "movss %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+	str << mov_instr << " %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
       }
       else{
-	str << "movl %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
+	str << mov_instr << " %" << fRegister_dest << ", " << fIdentifier << "(, %" << fRegister_index << ", 4)\n";
       }
       return str.str();
     }

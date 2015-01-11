@@ -242,6 +242,9 @@ iteration_statement
 | PRAGMA_SIMD FOR '(' IDENTIFIER '=' ICONSTANT ';' IDENTIFIER '<' ICONSTANT ';' IDENTIFIER INC_OP ')' statement {
   $$ = new Vectorized_for(*$4, $6, $10, $15);
   cout<<"for loop vectorized\n";}
+| PRAGMA_SIMD REDUCTION '(' '+' ':' IDENTIFIER ')' FOR '(' IDENTIFIER '=' ICONSTANT ';' IDENTIFIER '<' ICONSTANT ';' IDENTIFIER INC_OP ')' statement {
+  $$ = new Vectorized_for(*$10, $12, $16, $21, *$6);
+  cout<<"for loop vectorized and variable \'" + *$6 + "\' reduced\n";}
 ;
 
 jump_statement

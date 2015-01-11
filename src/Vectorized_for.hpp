@@ -12,8 +12,8 @@
 class Vectorized_for : public Iteration{
 public:
 
-  Vectorized_for(std::string fIterator, int fIt_begin, int fIt_end, Statement* fBody) : iterator(fIterator), it_begin(fIt_begin), it_end(fIt_end){
-    
+  Vectorized_for(std::string fIterator, int fIt_begin, int fIt_end, Statement* fBody, std::string fReduced_variable = "") : iterator(fIterator), it_begin(fIt_begin), it_end(fIt_end){
+    reduced_variable = fReduced_variable;
     body = fBody;
   }
 
@@ -51,11 +51,15 @@ cmpl $0, %eax\n";
   }
 
 
+  static std::string get_reduced_variable(){
+    return reduced_variable;
+  }
+
 protected:
   std::string iterator;
   int it_begin;
   int it_end;
-
+  static std::string reduced_variable;
 };
 
 #endif
