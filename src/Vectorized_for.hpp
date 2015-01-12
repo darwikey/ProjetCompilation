@@ -15,6 +15,10 @@ public:
   Vectorized_for(std::string fIterator, int fIt_begin, int fIt_end, Statement* fBody, std::string fReduced_variable = "") : iterator(fIterator), it_begin(fIt_begin), it_end(fIt_end){
     reduced_variable = fReduced_variable;
     body = fBody;
+    
+    if (((it_end - it_begin) % 4) != 0){
+      throw std::logic_error("in a vectorized loop, the number of iteration must be a multiple of 4");
+    }
   }
 
   virtual std::string get_code(std::vector<Block*> fParent_blocks, Function* fFunction, bool fVectorize = false) override {
