@@ -13,9 +13,12 @@ _f:                                 #fonction multipliant les 3 parametres
         pushl   %ebp
         movl    %esp, %ebp          # ebp pointe sur l adresse de retour
 
+        pushl   $4
+        
         movl    8(%ebp), %eax       # arg 1
         imul    12(%ebp), %eax      # arg 2
         imul    16(%ebp), %eax      # arg 3
+        imul    -4(%ebp), %eax
         
         leave
         ret

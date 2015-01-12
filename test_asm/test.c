@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void f()
+void f(float i)
 {
-	int i = 44;
-	printf("%d\n", i);
+	printf("%f\n", i);
 }
 
 int main(void) {
@@ -14,7 +13,7 @@ int main(void) {
 	
 	plop *= 22;
 	
-	f();
+	f(42.2);
 	
 	return 0;
 }
