@@ -161,9 +161,15 @@ std::string Block::get_code_store_variable(std::string fIdentifier, std::string 
     std::ostringstream str;
     if (fVar_type == Type::FLOAT){
       if (fVectorize){
+	// met la somme dans le registre xmm7
+	str << "movss " << it->second->stack_position << "(%ebp), %xmm7\n";
+	// recopie 3 fois le premier élément
+	str << "shufps $0x40, %xmm7, %xmm7\n";
+	str << "subps %xmm7, %" << fRegister << "\n";
+
 	// somme tous les éléments du registre entre eux
 	str << "haddps %" << fRegister << ", %" << fRegister << "\n";
-	std::cout<<"plop\n";
+	str << "haddps %" << fRegister << ", %" << fRegister << "\n";
       }
       str << "movss %" << fRegister << ", " << it->second->stack_position << "(%ebp)\n";
     }

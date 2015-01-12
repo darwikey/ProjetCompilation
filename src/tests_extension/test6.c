@@ -1,3 +1,4 @@
+
 int main() {
 
   float a[8];
@@ -5,14 +6,14 @@ int main() {
   float start;
   int i;
   s = 0.;
-  start = 0.;
+  start = 1.;
 
   for (i=0; i < 8; i++){
     a[i] = start;
-    start = start + 1.;
+    start = start + 3.;
   }
 
-#pragma omp simd reduction(+: s)
+  #pragma omp simd reduction(+: s)
   for (i=0; i < 8; i++) {
     s = s + a[i];
   }
