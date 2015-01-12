@@ -48,7 +48,7 @@ public:
 	Block* declaration_block = Expression::get_block(fParent_blocks, identifier);
 	Type var_type = this->get_expression_type(fParent_blocks);
 
-	if (var_type == Type::INT){
+	if (var_type == Type::INT || var_type == Type::POINTER || var_type == Type::FLOAT_POINTER){
 	  code += declaration_block->get_code_load_variable(identifier, "eax", var_type, fVectorize); 
 	}
 	else if (var_type == Type::FLOAT){
